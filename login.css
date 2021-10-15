@@ -3,3 +3,9 @@
     background-color: gold;
     border-color: gold;
 }
+
+.btn-primary:hover{
+    color: black;
+    background-color: goldenrod;
+    border-color: goldenrod;
+}
