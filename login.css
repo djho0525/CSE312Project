@@ -4,8 +4,32 @@
     padding: 10px;
     border-style:solid;
     border-width: 5px;
-    border-color: gold;
+    border-color: #212529;
     border-radius: 10px;
     width: 30%;
     text-align: center;
+    background-color:gold;
+}
+#loginSubmitButton{
+    margin: 5px;
+    border-width: 2px;
+    border-color: #212529;
+    border-radius: 5px;
+}
+#signUpSubmitButton{
+    margin: 5px;
+    border-width: 2px;
+    border-color: #212529;
+    border-radius: 5px;
+}
+.btn-primary{
+    color: black;
+    background-color: gold;
+    border-color: gold;
+}
+
+.btn-primary:hover{
+    color: black;
+    background-color: goldenrod;
+    border-color: goldenrod;
 }

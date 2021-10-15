@@ -14,8 +14,11 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
+    <!-- Custom stylesheet -->
+    <link rel="stylesheet" type="text/css" href="login.css">
+
+    <!-- Javascipt -->
     <script src="login.js"></script>
-    <link rel="stylesheet" href="login.css">
 
 <body>
 
@@ -31,24 +34,27 @@
     </div>
 </nav>
 
-<div class="form-group" id="loginForm" style="display:none;" >
-    <form>
+<div class="form-group" id="loginForm" style="display:none">
+    <form action="/login">
         <label for="loginEmail">Email address:</label>
         <input type="email" class="form-control" id="loginEmail">
         <label for="loginPwd">Password:</label>
         <input type="password" class="form-control" id="loginPwd">
+        <input type="submit" class="btn-primary" id="loginSubmitButton" value="Login">
     </form>
 </div>
-<div class="form-group" id="signUpForm" style="display:none;">
-    <form>
+<br/>
+<div class="form-group" id="signUpForm" style="display:none">
+    <form action="/signUp">
         <label for="signUpName">Name:</label>
         <input type="text" class="form-control" id="signUpName">
         <label for="signUpEmail">Email:</label>
         <input type="email" class="form-control" id="signUpEmail">
         <label for="signUpPwd">Password:</label>
         <input type="password" class="form-control" id="signUpPwd">
-        <label for="signUpConfirmPwd">Password:</label>
+        <label for="signUpConfirmPwd">Confirm Password:</label>
         <input type="password" class="form-control" id="signUpConfirmPwd">
+        <input type="submit" class="btn-primary"  id="signUpSubmitButton" value="Sign Up">
     </form>
 </div>
 
