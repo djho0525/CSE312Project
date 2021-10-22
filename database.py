@@ -38,7 +38,7 @@ def getUser(email):
 
 if __name__ == '__main__':
     resetTable()
-    addUser('email', 'password', 'test')
+    # addUser('email', 'password', 'test')
     cur.execute("SELECT * FROM users")
     for x in cur.fetchall(): print(x)
 
