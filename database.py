@@ -1,5 +1,6 @@
 import mysql.connector as mysql
 import os
+from User import User
 
 u = 'sqluser'   # os.environ['DB_USERNAME']
 p = 'sqluserpassword'   # os.environ['DB_PASSWORD']
@@ -8,33 +9,36 @@ cur = db.cursor()
 
 
 def setupTable():
-    cur.execute("CREATE TABLE IF NOT EXISTS users (username TEXT, password TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
 
 def resetTable():
     cur.execute("DROP TABLE users")
     setupTable()
 
 
-def addUser(username, password):
-    if userExists(username): print('username taken')
-    else: cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)", (username, password))
+def addUser(email, password, name):
+    cur.execute("INSERT INTO users (email, password, name) VALUES (%s, %s, %s)", (email, password, name))
     db.commit()
 
-def removeUser(username):
-    if not userExists(username): print('user does not exist')
-    cur.execute("DELETE FROM users WHERE username=%s", (username,))
+def removeUser(email):
+    cur.execute("DELETE FROM users WHERE email=%s", (email,))
     db.commit()
 
 
-def userExists(username):
-    cur.execute("SELECT username FROM users")
-    usernames = list(i[0] for i in cur.fetchall())
-    return username in usernames
+def userExists(email):
+    cur.execute("SELECT email FROM users")
+    emails = list(i[0] for i in cur.fetchall())
+    return email in emails
+
+def getUser(email):
+    cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+    row = cur.fetchone()
+    return User(row[0], row[1], row[2])
 
 
 if __name__ == '__main__':
     resetTable()
-    addUser('test', 'password')
+    addUser('email', 'password', 'test')
     cur.execute("SELECT * FROM users")
     for x in cur.fetchall(): print(x)
 
