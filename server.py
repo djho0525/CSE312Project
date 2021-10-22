@@ -15,11 +15,10 @@ def login():
 
     if db.userExists(email):
         user = db.getUser(email)
-        if user.password == password: print('Logged in successfully')
-        else: print('Login failed')
+        if user.password == password: return 'Logged in successfully'
+        else: return 'Login failed'
 
-    else: print('Username does not exist')
-    return
+    else: return 'Email is not registered'
 
 
 @app.route('/signUp', methods=['POST'])
@@ -27,15 +26,14 @@ def signUp():
     name = request.form['name']
     email = request.form['email']
     password = request.form['password']
-    conf_password = request.form['confirm_password']
+    confirm_password = request.form['confirm_password']
 
-    if db.userExists(email): print('Email was already registered')
+    if db.userExists(email): return 'Email was already registered'
     else:
-        if password == conf_password:
+        if password == confirm_password:
             db.addUser(email, password, name)
-            print('Created account successfully')
-        else: print('Passwords do not match')
-    return
+            return 'Created account successfully'
+        else: return 'Passwords do not match'
 
 
 if __name__ == '__main__':
