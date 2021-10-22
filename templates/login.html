@@ -15,10 +15,10 @@
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
     <!-- Custom stylesheet -->
-    <link rel="stylesheet" type="text/css" href="login.css">
+    <link rel="stylesheet" type="text/css" href="../styles/login.css">
 
     <!-- Javascipt -->
-    <script src="../login.js"></script>
+    <script src="../scripts/login.js"></script>
 
 <body>
 
@@ -35,7 +35,7 @@
 </nav>
 
 <div class="form-group" id="loginForm" style="display:none">
-    <form action="/login">
+    <form action="/login" method="post">
         <label for="loginEmail">Email address:</label>
         <input type="email" class="form-control" id="loginEmail">
         <label for="loginPwd">Password:</label>
@@ -45,7 +45,7 @@
 </div>
 <br/>
 <div class="form-group" id="signUpForm" style="display:none">
-    <form action="/signUp">
+    <form action="/signUp" method="post">
         <label for="signUpName">Name:</label>
         <input type="text" class="form-control" id="signUpName">
         <label for="signUpEmail">Email:</label>
