@@ -5,8 +5,9 @@ from User import User
 u = 'sqluser'   # os.environ['DB_USERNAME']
 p = 'sqluserpassword'   # os.environ['DB_PASSWORD']
 db = mysql.connect(user=u, password=p, database='cse312_project')
-cur = db.cursor()
+cur = db.cursor(prepared=True)
 
+users = {}      # {email: User object}
 
 def setupTable():
     cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
@@ -19,6 +20,7 @@ def resetTable():
 def addUser(email, password, name):
     cur.execute("INSERT INTO users (email, password, name) VALUES (%s, %s, %s)", (email, password, name))
     db.commit()
+    userSetup(email)
 
 def removeUser(email):
     cur.execute("DELETE FROM users WHERE email=%s", (email,))
@@ -30,16 +32,27 @@ def userExists(email):
     emails = list(i[0] for i in cur.fetchall())
     return email in emails
 
-def getUser(email):
+def userSetup(email):
     cur.execute("SELECT * FROM users WHERE email=%s", (email,))
     row = cur.fetchone()
-    return User(row[0], row[1], row[2])
+    if email not in users: users[email] = User(row[0], row[1], row[2])
+
+def getUser(email):
+    userSetup(email)
+    return users[email]
+
+def addMessage(receiver, sender, message):
+    if receiver not in users[sender].messages: users[sender].messages[receiver] = []
+    users[sender].messages[receiver].append(message)
+    if sender not in users[receiver].messages: users[receiver].messages[sender] = []
+    users[receiver].messages[sender].append(message)
 
 
 if __name__ == '__main__':
-    resetTable()
+    # resetTable()
     # addUser('email@gmail.com', 'password', 'test')
     cur.execute("SELECT * FROM users")
     for x in cur.fetchall(): print(x)
+    print(users)
 
     db.close()
