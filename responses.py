@@ -1,3 +1,4 @@
+import responses
 import util
 import database as db
 
@@ -10,7 +11,7 @@ def response404():
     return b"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: " + str(len("The requested content does not exist")).encode() + b"\r\n\r\nThe requested content does not exist\r\n"
 
 def response301(location):
-    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + str(location).encode() + b"\r\n"
+    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + location.encode() + b"\r\n"
 
 
 
@@ -43,9 +44,13 @@ def getResponse(path):
                 for x in activeUsers:
                     line = line + x
             content = content + line
+        if db.getColor("da@gmail.com")=="light":
+            content = content.replace("{{colorMode}}",'lightMode.css')
+        else:
+            content = content.replace("{{colorMode}}",'darkMode.css')
         return response200("text/html",len(content),content.encode())
-    elif path == "/home.css":
-        content = util.readBytes("static/home.css")
+    elif path == "/lightMode.css":
+        content = util.readBytes("static/lightMode.css")
         return response200("text/css", len(content), content)
     # IMAGE UPLOADS CURRENTLY ONLY ASSUME .JPG FILES WILL BE UPLOADED
     elif path == "/posts":
@@ -57,8 +62,17 @@ def getResponse(path):
             return response404()
         else:
             return response200("image/jpeg", len(content),content)
+    elif path == "/darkMode.css":
+        content = util.readBytes("static/darkMode.css")
+        return response200("text/css", len(content), content)
+    elif path == "/home.js":
+        content = util.readBytes("static/home.js")
+        return response200("text/javascript", len(content), content)
     else:
         return response404()
+
+
+
 
 
 
@@ -74,6 +88,7 @@ def postResponse(server, path, received_data):
     form = util.parsing(data.decode())
     print(form)
     path, queries = util.querying(path)
+    email = ""
 
     if path == "/login":
         email, password = form['email'], form['password']
@@ -95,10 +110,13 @@ def postResponse(server, path, received_data):
         else:
             if password == confirm_password:
                 db.addUser(email, password, name)
+                db.insertDefaultColor(email)
                 content = 'Created account successfully'
             else: content = 'Passwords do not match'
         content = content.encode()
         return response200("text/plain", len(content), content)
+    elif path == "/image-upload":
+        return response301("/")
     elif path == '/messages':
         receiver, sender, message = queries['receiver'], queries['sender'], form['message']
         db.addMessage(receiver, sender, message)
@@ -107,5 +125,8 @@ def postResponse(server, path, received_data):
         content = util.readBytes("templates/messages.html")
         content = content.decode().replace('{{message}}', messages).replace('{{receiver}}', receiver).replace("{{sender}}", sender).encode()
         return response200("text/html", len(content), content)
+    elif path == "/mode":
+        db.updateColor("da@gmail.com",form["Mode"])
+        return response301("/home")
     else:
         return response404()

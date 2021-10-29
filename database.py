@@ -92,16 +92,37 @@ def addLike(uploadID):
     cur.execute("UPDATE uploads SET likes = (%s) WHERE uploadID = (%s)", (newLikes, uploadID))
     db.commit()
 
+def setupColorMode():
+    cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
+
+def insertDefaultColor(email):
+    cur.execute("INSERT INTO colormode(email,mode) VALUES(%s,%s)",(email,"light"))
+    db.commit()
+
+def updateColor(email,color):
+    cur.execute("UPDATE colormode SET mode= (%s) WHERE email=(%s)",(color,email))
+    db.commit()
+
+def getColor(email):
+    cur.execute("SELECT mode FROM colormode WHERE email=(%s)",(email,))
+    color = cur.fetchone()
+    return color[0]
+
 if __name__ == '__main__':
     # resetTable()
-    # addUser('email@gmail.com', 'password', 'test')
+    #setupTable()
+    #addUser('email@gmail.com', 'password', 'test')
+    #setupUploadsTable()
     #uploadImage("/imageuploads/image1.jpg")
     #getAllImagePaths()
     #print(cur.fetchall())
     #getLikesByID(1)
     #addLike(1)
-    cur.execute("SELECT * FROM users")
-    for x in cur.fetchall(): print(x)
-    print(users)
+    #setupColorMode()
+    #print(getColor("da@gmail.com"))
+    #updateColor("da@gmail.com","dark")
+    #cur.execute("SELECT * FROM users")
+    #for x in cur.fetchall(): print(x)
+    #print(users)
 
     db.close()

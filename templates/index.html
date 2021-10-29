@@ -13,12 +13,12 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" href="home.css">
-
+    <link rel="stylesheet" type="text/css" id="lightMode" href="{{colorMode}}">
+    <!--<link rel="stylesheet" type="text/css" id="darkMode" href="darkMode.css">-->
+    <script src ="home.js"></script>
 </head>
 
 <body>
-
     <nav class="navbar navbar-expand-sm bg-dark navbar-dark sticky-top">
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
@@ -39,16 +39,26 @@
             </div>
         </div>
     </nav>
+    <form action="/mode" id="changeMode" method="post">
+            <!--<label for="lightModeCheckbox">Dark Theme</label>
+            <input  id="lightModeCheckbox" type="checkbox" onclick="setDarkMode(this.checked)">-->
+        <select id="mode" onchange="enableButton()" name="Mode">
+            <option selected disabled> -- select an option --  </option>
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+        </select>
+        <input type="submit" id="submit-mode" disabled="true" value="Submit">
+    </form>
 
-<form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
-    <input value={{xsrftoken}} name="xsrf_token" hidden>
-    <label for="form-file">Image: </label>
-    <input id="form-file" type="file" name="upload">
-    <br/>
-    <label for="image-form-name">Caption: </label>
-    <input id="image-form-name" type="text" name="caption">
-    <input type="submit" value="Submit">
-</form>
+    <form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
+        <input value={{xsrftoken}} name="xsrf_token" hidden>
+        <label for="form-file">Image: </label>
+        <input id="form-file" type="file" name="upload">
+        <br/>
+        <label for="image-form-name">Caption: </label>
+        <input id="image-form-name" type="text" name="caption">
+        <input type="submit" value="Submit">
+    </form>
     <h1>Feed</h1>
 
     {{image_loop}}

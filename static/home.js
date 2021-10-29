@@ -1,13 +1,8 @@
-/*var useDarkTheme = localStorage.getItem("darkTheme") === "true";
-setDarkMode(useDarkTheme);
-
-function setDarkMode(isDark) {
-    // Based on https://stackoverflow.com/a/37416531
-    var LightMode = document.getElementById("lightMode");
-    LightMode.disabled = isDark;
-    localStorage.setItem("darkTheme", isDark)
-}*/
-var useDarkTheme = localStorage.getItem("LightDark") === "dark";
+function enableButton(){
+    let button = document.getElementById("submit-mode")
+    button.disabled=false
+}
+/*var useDarkTheme = localStorage.getItem("LightDark") === "dark";
 setDarkMode(useDarkTheme);
 
 function loadBody(){
@@ -39,4 +34,4 @@ function setDarkMode(darkMode){
         lightModeOFF.disabled = false
         localStorage.setItem("LightDark", "light")
     }
-}
+}*/
