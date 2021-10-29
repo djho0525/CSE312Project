@@ -7,7 +7,8 @@ def response200(con_type, length, content):  # input content has to be encoded
 def response404():
     return b"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: " + str(len("The requested content does not exist")).encode() + b"\r\n\r\nThe requested content does not exist\r\n"
 
-
+def response301(location):
+    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + location + b"\r\n"
 
 
 
@@ -60,5 +61,7 @@ def postResponse(server, path, received_data):
             else: content = 'Passwords do not match'
         content = content.encode()
         return response200("text/plain", len(content), content)
+    elif path == "/image-upload":
+        return response301("/")
     else:
         return response404()
