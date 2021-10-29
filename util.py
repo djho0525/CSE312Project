@@ -30,3 +30,10 @@ def parsing(data):
         form[name] = value
     return form
 
+def querying(queries):
+    result = {}
+    print('queries are '+queries)
+    for x in queries.split('&'):
+        key, val = x.split('=')
+        result[key] = val
+    return result
