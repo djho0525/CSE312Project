@@ -57,7 +57,7 @@ def resetUploadsTable():
 def uploadImage(imagePath):
     #First Column will be auto-incremented Image ID
     #May need to add column for number of likes
-    cur.execute("INSERT INTO uploads (imagepath) VALUES (%s)", (imagePath))
+    cur.execute("INSERT INTO uploads (imagepath) VALUES (%s)", (imagePath,))
     db.commit()
 
 def getAllImages():
@@ -75,24 +75,31 @@ def getAllImagePaths():
     return imagesPaths
 
 def getImageByID(uploadID):
-    cur.execute("SELECT imagepath FROM uploads WHERE uploadID = (%s)", uploadID)
+    cur.execute("SELECT imagepath FROM uploads WHERE uploadID = (%s)", (uploadID,))
     image = cur.fetchone()
     return image
 
 def getLikesByID(uploadID):
-    cur.execute("SELECT likes FROM uploads WHERE uploadID = (%s)", uploadID)
+    cur.execute("SELECT likes FROM uploads WHERE uploadID = (%s)", (uploadID,))
     likes = cur.fetchone()
-    return likes
+    print(likes[0])
+    return int(likes[0])
 
 def addLike(uploadID):
     currentLikes = getLikesByID(uploadID)
     newLikes = currentLikes + 1
+    print(newLikes)
     cur.execute("UPDATE uploads SET likes = (%s) WHERE uploadID = (%s)", (newLikes, uploadID))
-    cur.execute()
+    db.commit()
 
 if __name__ == '__main__':
     # resetTable()
     # addUser('email@gmail.com', 'password', 'test')
+    #uploadImage("/imageuploads/image1.jpg")
+    #getAllImagePaths()
+    #print(cur.fetchall())
+    #getLikesByID(1)
+    #addLike(1)
     cur.execute("SELECT * FROM users")
     for x in cur.fetchall(): print(x)
     print(users)
