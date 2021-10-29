@@ -44,6 +44,9 @@ def getResponse(path):
                     line = line + x
             content = content + line
         return response200("text/html",len(content),content.encode())
+    elif path == "/home.css":
+        content = util.readBytes("static/home.css")
+        return response200("text/css", len(content), content)
     else:
         return response404()
 
