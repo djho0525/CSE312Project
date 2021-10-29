@@ -13,6 +13,7 @@ def response404():
 
 def getResponse(path):
     print("GET" + path)
+    path, queries = util.querying(path)
 
     if path == "/":
         content = util.readBytes("templates/login.html")
@@ -26,6 +27,11 @@ def getResponse(path):
     elif path == "/jessehartloff.jpeg":
         content = util.readBytes("static/jessehartloff.jpeg")
         return response200("image/jpeg", len(content), content)
+    elif path == "/messages":
+        receiver, sender = queries['receiver'], queries['sender']
+        content = util.readBytes("templates/messages.html")
+        content = content.decode().replace('{{message}}', '').replace('{{receiver}}', receiver).replace("{{sender}}", sender).encode()
+        return response200("text/html", len(content), content)
     else:
         return response404()
 
@@ -40,6 +46,7 @@ def postResponse(server, path, received_data):
     print(data)
     form = util.parsing(data.decode())
     print(form)
+    path, queries = util.querying(path)
 
     if path == "/login":
         email, password = form['email'], form['password']
@@ -60,5 +67,13 @@ def postResponse(server, path, received_data):
             else: content = 'Passwords do not match'
         content = content.encode()
         return response200("text/plain", len(content), content)
+    elif path == '/messages':
+        receiver, sender, message = queries['receiver'], queries['sender'], form['message']
+        db.addMessage(receiver, sender, message)
+        messages = ''
+        for i in db.users[receiver].messages[sender]: messages += i + '<br/>'
+        content = util.readBytes("templates/messages.html")
+        content = content.decode().replace('{{message}}', messages).replace('{{receiver}}', receiver).replace("{{sender}}", sender).encode()
+        return response200("text/html", len(content), content)
     else:
         return response404()
