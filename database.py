@@ -47,6 +47,48 @@ def addMessage(receiver, sender, message):
     if sender not in users[receiver].messages: users[receiver].messages[sender] = []
     users[receiver].messages[sender].append(message)
 
+def setupUploadsTable():
+    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT, imagepath TEXT NOT NULL, likes INT NOT NULL DEFAULT 0)")
+
+def resetUploadsTable():
+    cur.execute("DROP TABLE users")
+    setupUploadsTable()
+
+def uploadImage(imagePath):
+    #First Column will be auto-incremented Image ID
+    #May need to add column for number of likes
+    cur.execute("INSERT INTO uploads (imagepath) VALUES (%s)", (imagePath))
+    db.commit()
+
+def getAllImages():
+    #Can limit the amount of images retrived
+    #cur.execute("SELECT * FROM uploads LIMIT 10")
+    cur.execute("SELECT * FROM uploads")
+    images = cur.fetchall
+    return images
+
+def getAllImagePaths():
+    #Can limit the amount of imagesPaths retrived
+    #cur.execute("SELECT imagepath FROM uploads LIMIT 10")
+    cur.execute("SELECT imagepath FROM uploads")
+    imagesPaths = cur.fetchall
+    return imagesPaths
+
+def getImageByID(uploadID):
+    cur.execute("SELECT imagepath FROM uploads WHERE uploadID = (%s)", uploadID)
+    image = cur.fetchone()
+    return image
+
+def getLikesByID(uploadID):
+    cur.execute("SELECT likes FROM uploads WHERE uploadID = (%s)", uploadID)
+    likes = cur.fetchone()
+    return likes
+
+def addLike(uploadID):
+    currentLikes = getLikesByID(uploadID)
+    newLikes = currentLikes + 1
+    cur.execute("UPDATE uploads SET likes = (%s) WHERE uploadID = (%s)", (newLikes, uploadID))
+    cur.execute()
 
 if __name__ == '__main__':
     # resetTable()

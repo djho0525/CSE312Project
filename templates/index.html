@@ -16,6 +16,22 @@
 </head>
 
 <body>
+<form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
+    <input value={{xsrftoken}} name="xsrf_token" hidden>
+    <label for="form-file">Image: </label>
+    <input id="form-file" type="file" name="upload">
+    <br/>
+    <label for="image-form-name">Caption: </label>
+    <input id="image-form-name" type="text" name="caption">
+    <input type="submit" value="Submit">
+</form>
+    <h1>Feed</h1>
+
+    {{image_loop}}
+    <br>
+    <img src="{{image_filename}}"/>
+    <br>
+    {{image_end_loop}}
 </body>
 
 </html>
