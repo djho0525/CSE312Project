@@ -30,10 +30,11 @@ def parsing(data):
         form[name] = value
     return form
 
-def querying(queries):
+def querying(path):
+    if len(path.split('?')) <= 1: return path, {}
+    path, queries = path.split("?")
     result = {}
-    print('queries are '+queries)
     for x in queries.split('&'):
         key, val = x.split('=')
         result[key] = val
-    return result
+    return path, result
