@@ -36,7 +36,7 @@ def getUser(email):
     return User(row[0], row[1], row[2])
 
 def setupUploadsTable():
-    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT, imagepath TEXT NOT NULL)")
+    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT, imagepath TEXT NOT NULL, likes INT NOT NULL DEFAULT 0)")
 
 def resetUploadsTable():
     cur.execute("DROP TABLE users")
@@ -66,6 +66,17 @@ def getImageByID(uploadID):
     cur.execute("SELECT imagepath FROM uploads WHERE uploadID = (%s)", uploadID)
     image = cur.fetchone()
     return image
+
+def getLikesByID(uploadID):
+    cur.execute("SELECT likes FROM uploads WHERE uploadID = (%s)", uploadID)
+    likes = cur.fetchone()
+    return likes
+
+def addLike(uploadID):
+    currentLikes = getLikesByID(uploadID)
+    newLikes = currentLikes + 1
+    cur.execute("UPDATE uploads SET likes = (%s) WHERE uploadID = (%s)", (newLikes, uploadID))
+    cur.execute()
 
 if __name__ == '__main__':
     resetTable()
