@@ -4,3 +4,4 @@ class User:
         self.email = email
         self.password = password
         self.name = name
+        self.messages = {}      # email: [message1, message2, .......]
