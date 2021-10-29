@@ -10,7 +10,7 @@ def response404():
     return b"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: " + str(len("The requested content does not exist")).encode() + b"\r\n\r\nThe requested content does not exist\r\n"
 
 def response301(location):
-    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + location + b"\r\n"
+    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + str(location).encode() + b"\r\n"
 
 
 
@@ -47,15 +47,27 @@ def getResponse(path):
     elif path == "/home.css":
         content = util.readBytes("static/home.css")
         return response200("text/css", len(content), content)
+    # IMAGE UPLOADS CURRENTLY ONLY ASSUME .JPG FILES WILL BE UPLOADED
+    elif path == "/posts":
+        content = util.renderImages()
+        return response200("text/html", len(content), content.encode())
+    elif path.find("/uploadedimage/") != -1:
+        content = util.hostImage(path)
+        if content is None:
+            return response404()
+        else:
+            return response200("image/jpeg", len(content),content)
     else:
         return response404()
 
 
 
-
-
-
 def postResponse(server, path, received_data):
+    # Body of image must not be decoded, data is decoded below
+    if path == "/image-upload":
+        util.imageUpload(server, received_data)
+        return response301("/posts")
+
     print("POST" + path)
     header, data = util.buffering(server, received_data)
     print(data)
@@ -70,7 +82,7 @@ def postResponse(server, path, received_data):
             if user.password == password:
                 email = email.replace("%40", "@")
                 activeUsers.append('<a class ="dropdown-item" href="#" >' + email + '</a>')
-                return response301("/home".encode())
+                return response301("/home")
             else:
                 content = 'Login failed'
         else:
@@ -87,8 +99,6 @@ def postResponse(server, path, received_data):
             else: content = 'Passwords do not match'
         content = content.encode()
         return response200("text/plain", len(content), content)
-    elif path == "/image-upload":
-        return response301("/")
     elif path == '/messages':
         receiver, sender, message = queries['receiver'], queries['sender'], form['message']
         db.addMessage(receiver, sender, message)
