@@ -1,3 +1,7 @@
+body{
+    background-color:gold;
+}
+
 .form-group{
     margin:auto;
     margin-top: 10px;
@@ -10,23 +14,12 @@
     text-align: center;
     background-color:gold;
 }
-#loginSubmitButton{
-    margin: 5px;
-    border-width: 2px;
-    border-color: #212529;
-    border-radius: 5px;
-}
-#signUpSubmitButton{
-    margin: 5px;
-    border-width: 2px;
-    border-color: #212529;
-    border-radius: 5px;
-}
+
 .btn-primary{
     color: black;
     background-color: gold;
     border-color: gold;
-    width: 90px;
+    margin:5px;
 }
 
 .btn-primary:hover{
