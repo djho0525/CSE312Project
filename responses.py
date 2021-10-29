@@ -1,6 +1,8 @@
 import util
 import database as db
 
+activeUsers = []
+
 def response200(con_type, length, content):  # input content has to be encoded
     return b"HTTP/1.1 200 OK\r\nContent-Type:" + con_type.encode() + b"\r\nX-Content-Type-Options: nosniff\r\nContent-Length: " + str(length).encode() + b"\r\n\r\n" + content + b"\r\n"
 
@@ -33,6 +35,15 @@ def getResponse(path):
         content = util.readBytes("templates/messages.html")
         content = content.decode().replace('{{message}}', '').replace('{{receiver}}', receiver).replace("{{sender}}", sender).encode()
         return response200("text/html", len(content), content)
+    elif path == "/home":
+        content = ""
+        idxFile = open('templates/index.html', 'rt').readlines()
+        for line in idxFile:
+            if line.find("<!--ActiveUsers-->") != -1:
+                for x in activeUsers:
+                    line = line + x
+            content = content + line
+        return response200("text/html",len(content),content.encode())
     else:
         return response404()
 
@@ -53,9 +64,14 @@ def postResponse(server, path, received_data):
         email, password = form['email'], form['password']
         if db.userExists(email):
             user = db.getUser(email)
-            if user.password == password: content = 'Logged in successfully'
-            else: content = 'Login failed'
-        else: content = 'Email is not registered'
+            if user.password == password:
+                email = email.replace("%40", "@")
+                activeUsers.append('<a class ="dropdown-item" href="#" >' + email + '</a>')
+                return response301("/home".encode())
+            else:
+                content = 'Login failed'
+        else:
+            content = 'Email is not registered'
         content = content.encode()
         return response200("text/plain", len(content), content)
     elif path == '/signUp':
