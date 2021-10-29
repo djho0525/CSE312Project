@@ -13,12 +13,12 @@ def buffering(server, received_data):
         data += server.request.recv(1024)
     data = received_data.split(b"\r\n\r\n", 1)
     header, body = data[0].strip().decode(), data[1]
-    # print(header)
-    request_line = header.split('\r\n')
-    content_len = int(request_line[3].split(' ')[1])        # Content-Length: num
+    header = header.split('\r\n')
+    content_len = int(header[3].split(' ')[1])        # Content-Length: num
     while content_len-len(body) > 0:
         body += server.request.recv(1024)
-    return header, body.strip()
+    print(header[1:])
+    return header[1:], body.strip()
 
 def parsing(data):
     form = dict()
