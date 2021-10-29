@@ -36,7 +36,7 @@ def getUser(email):
     return User(row[0], row[1], row[2])
 
 def setupUploadsTable():
-    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT, imagepath TEXT NOT NULL, likes INT NOT NULL DEFAULT 0)")
+    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, likes INT NOT NULL DEFAULT 0)")
 
 def resetUploadsTable():
     cur.execute("DROP TABLE users")
@@ -80,6 +80,7 @@ def addLike(uploadID):
 
 if __name__ == '__main__':
     resetTable()
+    resetUploadsTable()
     # addUser('email@gmail.com', 'password', 'test')
     cur.execute("SELECT * FROM users")
     for x in cur.fetchall(): print(x)
