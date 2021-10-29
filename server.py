@@ -1,40 +1,26 @@
-from flask import Flask, render_template, request
-import database as db
+import socketserver
+import responses
 
-app = Flask(__name__)
+class MyTCPHandler(socketserver.BaseRequestHandler):
 
-@app.route('/')
-def startupPage():
-    return render_template('login.html')    # render_template looks at 'templates' as root folder
+    def handle(self):
 
+        received_data = self.request.recv(1024)
+        client_id = self.client_address[0] + ":" + str(self.client_address[1])
 
-@app.route('/login', methods=['POST'])
-def login():
-    email = request.form['email']
-    password = request.form['password']
+        request_line = received_data.strip().decode().split('\r\n')[0].split(' ')  # ie. ["GET", "/", "HTTP/1.1"]
+        request_type, path = request_line[0], request_line[1]
 
-    if db.userExists(email):
-        user = db.getUser(email)
-        if user.password == password: return 'Logged in successfully'
-        else: return 'Login failed'
+        if request_type == "GET": response = responses.getResponse(path)
+        else: response = responses.postResponse(self, path, received_data)
 
-    else: return 'Email is not registered'
+        self.request.sendall(response)
 
 
-@app.route('/signUp', methods=['POST'])
-def signUp():
-    name = request.form['name']
-    email = request.form['email']
-    password = request.form['password']
-    confirm_password = request.form['confirm_password']
+if __name__ == "__main__":
+    host = "0.0.0.0"
+    port = 8000
 
-    if db.userExists(email): return 'Email was already registered'
-    else:
-        if password == confirm_password:
-            db.addUser(email, password, name)
-            return 'Created account successfully'
-        else: return 'Passwords do not match'
-
-
-if __name__ == '__main__':
-    app.run(debug=True, host='localhost', port=8000)
+    print('Running on ' + str(port))
+    server = socketserver.ThreadingTCPServer((host, port), MyTCPHandler)
+    server.serve_forever()
