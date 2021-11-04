@@ -56,10 +56,6 @@ def getResponse(path):
     elif path == "/lightMode.css":
         content = util.readBytes("static/lightMode.css")
         return response200("text/css", len(content), content)
-    # IMAGE UPLOADS CURRENTLY ONLY ASSUME .JPG FILES WILL BE UPLOADED
-    elif path == "/posts":
-        content = util.renderImages()
-        return response200("text/html", len(content), content.encode())
     elif path.find("/uploadedimage/") != -1:
         content = util.hostImage(path)
         if content is None:
@@ -139,6 +135,6 @@ def postResponse(server, path, received_data):
     elif path == "/upvote":
         imageID = int(str(form["uploadID"]).strip("image"))
         db.addLike(imageID)
-        return response301("/posts")
+        return response301("/home")
     else:
         return response404()

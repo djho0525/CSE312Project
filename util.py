@@ -155,27 +155,21 @@ def renderImages(html):
     loopEndIndex = readFile.find("{{image_end_loop}}")
     contentPlaceholder = readFile[loopStartIndex + 14:loopEndIndex]
 
-    allImageTagsAndCaption = ""
-    '''for image in imageUploads:
-        captionAndImageName = image.split(":")
-        caption = captionAndImageName[0]
-        imageName = captionAndImageName[1]
-        currentImageTag = contentPlaceholder.replace("{{image_filename}}", "/uploadedimage/" + imageName + ".jpg")  # when browser receives our images.html it will make request(s) for the image(s) thru a request url of /image/<image_name> "/image/" is the path we told the browser to request in the html
-        print(currentImageTag)
-        allImageTagsAndCaption += currentImageTag
-        allImageTagsAndCaption += caption
-        allImageTagsAndCaption = allImageTagsAndCaption.replace("{{uploadID}}","image"+str(imageNameCount))'''
+    allImageTagsCaptionLikes = ""
     for image in db.getLatest10Uploads():
-        caption = image[2]
-        imageName = image[1].split('/')[1]
         imageID = image[0]
+        imageName = image[1].split('/')[1]
+        caption = image[2]
+        likes = image[3]
         currentImageTag = contentPlaceholder.replace("{{image_filename}}", "/uploadedimage/" + imageName + ".jpg")  # when browser receives our images.html it will make request(s) for the image(s) thru a request url of /image/<image_name> "/image/" is the path we told the browser to request in the html
         print(currentImageTag)
-        allImageTagsAndCaption += currentImageTag
-        allImageTagsAndCaption += caption
-        allImageTagsAndCaption = allImageTagsAndCaption.replace("{{uploadID}}","image"+str(imageID))
+        allImageTagsCaptionLikes += currentImageTag
+        allImageTagsCaptionLikes += "<label>Likes: "+str(likes)+"</label>"
+        allImageTagsCaptionLikes += "<br>"
+        allImageTagsCaptionLikes += "<label>"+caption+"</label>"
+        allImageTagsCaptionLikes = allImageTagsCaptionLikes.replace("{{uploadID}}","image"+str(imageID))
 
-    readFile = readFile[:loopStartIndex] + allImageTagsAndCaption + readFile[loopEndIndex:]
+    readFile = readFile[:loopStartIndex] + allImageTagsCaptionLikes + readFile[loopEndIndex:]
     readFile = readFile.replace("{{image_loop}}", '')
     readFile = readFile.replace("{{image_end_loop}}", '')
     return readFile
