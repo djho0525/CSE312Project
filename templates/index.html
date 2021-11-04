@@ -13,7 +13,7 @@
     <!-- Latest compiled JavaScript -->
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 
-    <link rel="stylesheet" type="text/css" id="lightMode" href="{{colorMode}}">
+    <link rel="stylesheet" type="text/css" id="lightMode" href={{colorMode}}>
     <!--<link rel="stylesheet" type="text/css" id="darkMode" href="darkMode.css">-->
     <script src ="home.js"></script>
 </head>
@@ -64,6 +64,10 @@
     {{image_loop}}
     <br>
     <img src="{{image_filename}}"/>
+    <form action="/upvote" method="post">
+        <input type="hidden" value={{uploadID}} name="uploadID">
+        <input type="submit" value="Like">
+    </form>
     <br>
     {{image_end_loop}}
 </body>

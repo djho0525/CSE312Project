@@ -48,16 +48,16 @@ def addMessage(receiver, sender, message):
     users[receiver].messages[sender].append(message)
 
 def setupUploadsTable():
-    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, likes INT NOT NULL DEFAULT 0)")
+    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
 
 def resetUploadsTable():
     cur.execute("DROP TABLE users")
     setupUploadsTable()
 
-def uploadImage(imagePath):
+def uploadImage(imagePath,caption):
     #First Column will be auto-incremented Image ID
     #May need to add column for number of likes
-    cur.execute("INSERT INTO uploads (imagepath) VALUES (%s)", (imagePath,))
+    cur.execute("INSERT INTO uploads (imagepath,caption) VALUES (%s,%s)", (imagePath,caption))
     db.commit()
 
 def getAllImages():
@@ -75,7 +75,7 @@ def getAllImagePaths():
     return imagesPaths
 
 def getImageByID(uploadID):
-    cur.execute("SELECT imagepath FROM uploads WHERE uploadID = (%s)", (uploadID,))
+    cur.execute("SELECT imagepath,caption FROM uploads WHERE uploadID = (%s)", (uploadID,))
     image = cur.fetchone()
     return image
 
@@ -84,6 +84,11 @@ def getLikesByID(uploadID):
     likes = cur.fetchone()
     print(likes[0])
     return int(likes[0])
+
+def getLastIDNum():
+    cur.execute("SELECT max(uploadID) FROM uploads")
+    id = cur.fetchone()
+    return id[0]
 
 def addLike(uploadID):
     currentLikes = getLikesByID(uploadID)
@@ -113,9 +118,11 @@ if __name__ == '__main__':
     #setupTable()
     #addUser('email@gmail.com', 'password', 'test')
     #setupUploadsTable()
-    #uploadImage("/imageuploads/image1.jpg")
+    #uploadImage("/imageuploads/image1.jpg","hi")
+    #print(getImageByID(1)[0]#[1])
     #getAllImagePaths()
     #print(cur.fetchall())
+    #print(getLastIDNum())
     #getLikesByID(1)
     #addLike(1)
     #setupColorMode()

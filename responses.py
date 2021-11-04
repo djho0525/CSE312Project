@@ -85,10 +85,12 @@ def postResponse(server, path, received_data):
     print("POST" + path)
     header, data = util.buffering(server, received_data)
     print(data)
-    form = util.parsing(data.decode())
-    print(form)
+    try:
+        form = util.parsing(data.decode())
+        print(form)
+    except ValueError:
+        print("SKIPPED PARSING")
     path, queries = util.querying(path)
-    email = ""
 
     if path == "/login":
         email, password = form['email'], form['password']
@@ -115,8 +117,6 @@ def postResponse(server, path, received_data):
             else: content = 'Passwords do not match'
         content = content.encode()
         return response200("text/plain", len(content), content)
-    elif path == "/image-upload":
-        return response301("/")
     elif path == '/messages':
         receiver, sender, message = queries['receiver'], queries['sender'], form['message']
         db.addMessage(receiver, sender, message)
@@ -128,5 +128,9 @@ def postResponse(server, path, received_data):
     elif path == "/mode":
         db.updateColor("da@gmail.com",form["Mode"])
         return response301("/home")
+    elif path == "/upvote":
+        imageID = int(str(form["uploadID"]).strip("image"))
+        db.addLike(imageID)
+        return response404()
     else:
         return response404()

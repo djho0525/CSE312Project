@@ -1,3 +1,5 @@
+import database as db
+
 def readBytes(filename):
     with open(filename, "rb") as file: b = file.read()
     file.close()
@@ -63,10 +65,9 @@ def parseHeaders(headers):
 
 imageUploads = []
 validFiles = []
-imageNameCount = 0
 
 def imageUpload(server, receive):
-    global imageNameCount
+    imageNameCount = db.getLastIDNum()
     newLineAfterHeadersInBytes = receive.find("\r\n\r\n".encode())
     # print(newLineAfterHeadersInBytes)
     requestInBytes = receive[0:newLineAfterHeadersInBytes]
@@ -140,11 +141,13 @@ def imageUpload(server, receive):
     #currentUploaderComment = cleanMessage(currentUploaderComment)
     imageUploads.append(currentUploaderComment + ":" + "image" + str(imageNameCount))
     validFiles.append("image" + str(imageNameCount) + ".jpg")
+    db.uploadImage("imageUploads/" +"image"+str(imageNameCount),currentUploaderComment)
     print("VALID FILES")
     print(validFiles)
     print(imageUploads)
 
 def renderImages():
+    imageNameCount = db.getLastIDNum()
     # Uses HTML Templates to render images
     file = open("templates/index.html", "r")
     readFile = file.read()  # .read() reads bytes into a string
@@ -161,6 +164,7 @@ def renderImages():
         print(currentImageTag)
         allImageTagsAndCaption += currentImageTag
         allImageTagsAndCaption += caption
+        allImageTagsAndCaption = allImageTagsAndCaption.replace("{{uploadID}}","image"+str(imageNameCount))
 
     readFile = readFile[:loopStartIndex] + allImageTagsAndCaption + readFile[loopEndIndex:]
     readFile = readFile.replace("{{image_loop}}", '')
