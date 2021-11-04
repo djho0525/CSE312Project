@@ -3,6 +3,7 @@ import util
 import database as db
 
 activeUsers = []
+currentUser = []
 
 def response200(con_type, length, content):  # input content has to be encoded
     return b"HTTP/1.1 200 OK\r\nContent-Type:" + con_type.encode() + b"\r\nX-Content-Type-Options: nosniff\r\nContent-Length: " + str(length).encode() + b"\r\n\r\n" + content + b"\r\n"
@@ -44,7 +45,7 @@ def getResponse(path):
                 for x in activeUsers:
                     line = line + x
             content = content + line
-        if db.getColor("da@gmail.com")=="light":
+        if db.getColor(currentUser[0]) == "light":
             content = content.replace("{{colorMode}}",'lightMode.css')
         else:
             content = content.replace("{{colorMode}}",'darkMode.css')
@@ -77,11 +78,6 @@ def getResponse(path):
 
 
 def postResponse(server, path, received_data):
-    # Body of image must not be decoded, data is decoded below
-    if path == "/image-upload":
-        util.imageUpload(server, received_data)
-        return response301("/posts")
-
     print("POST" + path)
     header, data = util.buffering(server, received_data)
     print(data)
@@ -99,6 +95,8 @@ def postResponse(server, path, received_data):
             if user.password == password:
                 email = email.replace("%40", "@")
                 activeUsers.append('<a class ="dropdown-item" href="#" >' + email + '</a>')
+                currentUser.clear()
+                currentUser.append(email)
                 return response301("/home")
             else:
                 content = 'Login failed'
@@ -126,7 +124,9 @@ def postResponse(server, path, received_data):
         content = content.decode().replace('{{message}}', messages).replace('{{receiver}}', receiver).replace("{{sender}}", sender).encode()
         return response200("text/html", len(content), content)
     elif path == "/mode":
-        db.updateColor("da@gmail.com",form["Mode"])
+        print(form["Mode"])
+        print(currentUser[0])
+        db.updateColor(currentUser[0],form["Mode"])
         return response301("/home")
     elif path == "/upvote":
         imageID = int(str(form["uploadID"]).strip("image"))

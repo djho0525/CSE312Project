@@ -105,19 +105,21 @@ def insertDefaultColor(email):
     db.commit()
 
 def updateColor(email,color):
+    email = email.replace("@","%40")
     cur.execute("UPDATE colormode SET mode= (%s) WHERE email=(%s)",(color,email))
     db.commit()
 
 def getColor(email):
+    email = email.replace("@","%40")
     cur.execute("SELECT mode FROM colormode WHERE email=(%s)",(email,))
     color = cur.fetchone()
     return color[0]
 
 if __name__ == '__main__':
     # resetTable()
-    #setupTable()
+    setupTable()
     #addUser('email@gmail.com', 'password', 'test')
-    #setupUploadsTable()
+    setupUploadsTable()
     #uploadImage("/imageuploads/image1.jpg","hi")
     #print(getImageByID(1)[0]#[1])
     #getAllImagePaths()
@@ -125,7 +127,7 @@ if __name__ == '__main__':
     #print(getLastIDNum())
     #getLikesByID(1)
     #addLike(1)
-    #setupColorMode()
+    setupColorMode()
     #print(getColor("da@gmail.com"))
     #updateColor("da@gmail.com","dark")
     #cur.execute("SELECT * FROM users")
