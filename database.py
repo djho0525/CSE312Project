@@ -93,6 +93,11 @@ def getLastIDNum():
     else:
         return 0
 
+def getLatest10Uploads():
+    cur.execute("SELECT * FROM cse312_project.uploads ORDER BY uploadID desc LIMIT 10")
+    latestUploads = cur.fetchall()
+    return latestUploads
+
 def addLike(uploadID):
     currentLikes = getLikesByID(uploadID)
     newLikes = currentLikes + 1
@@ -136,5 +141,5 @@ if __name__ == '__main__':
     #cur.execute("SELECT * FROM users")
     #for x in cur.fetchall(): print(x)
     #print(users)
-
+    print(getLatest10Uploads())
     db.close()

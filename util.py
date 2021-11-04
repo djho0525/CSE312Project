@@ -156,7 +156,7 @@ def renderImages(html):
     contentPlaceholder = readFile[loopStartIndex + 14:loopEndIndex]
 
     allImageTagsAndCaption = ""
-    for image in imageUploads:
+    '''for image in imageUploads:
         captionAndImageName = image.split(":")
         caption = captionAndImageName[0]
         imageName = captionAndImageName[1]
@@ -164,7 +164,16 @@ def renderImages(html):
         print(currentImageTag)
         allImageTagsAndCaption += currentImageTag
         allImageTagsAndCaption += caption
-        allImageTagsAndCaption = allImageTagsAndCaption.replace("{{uploadID}}","image"+str(imageNameCount))
+        allImageTagsAndCaption = allImageTagsAndCaption.replace("{{uploadID}}","image"+str(imageNameCount))'''
+    for image in db.getLatest10Uploads():
+        caption = image[2]
+        imageName = image[1].split('/')[1]
+        imageID = image[0]
+        currentImageTag = contentPlaceholder.replace("{{image_filename}}", "/uploadedimage/" + imageName + ".jpg")  # when browser receives our images.html it will make request(s) for the image(s) thru a request url of /image/<image_name> "/image/" is the path we told the browser to request in the html
+        print(currentImageTag)
+        allImageTagsAndCaption += currentImageTag
+        allImageTagsAndCaption += caption
+        allImageTagsAndCaption = allImageTagsAndCaption.replace("{{uploadID}}","image"+str(imageID))
 
     readFile = readFile[:loopStartIndex] + allImageTagsAndCaption + readFile[loopEndIndex:]
     readFile = readFile.replace("{{image_loop}}", '')
@@ -177,13 +186,13 @@ def hostImage(path):
     slashBeforeImageName = path.find("/", firstSlash + 1)
     imageName = path[slashBeforeImageName + 1:]
     # imageName = cleanFileName(imageName)
-    if imageName not in validFiles:
+    '''if imageName not in validFiles:
         print("INVALID FILE REQUEST")
         print("CURRENT VALID FILES")
         print(validFiles)
         print("CURRENT FILE NAME REQUESTED: " + imageName)
         return None
-    print(f"Path is image path, image name is {imageName}")
+    print(f"Path is image path, image name is {imageName}")'''
     try:
         file = open(f"imageUploads/{imageName}", "rb")
         readFile = file.read()  # .read() reads bytes into byte array using "rb"
