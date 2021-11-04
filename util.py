@@ -146,11 +146,11 @@ def imageUpload(server, receive):
     print(validFiles)
     print(imageUploads)
 
-def renderImages():
+def renderImages(html):
     imageNameCount = db.getLastIDNum()
     # Uses HTML Templates to render images
-    file = open("templates/index.html", "r")
-    readFile = file.read()  # .read() reads bytes into a string
+    #file = open("templates/index.html", "r")
+    readFile = html #file.read()  # .read() reads bytes into a string
     loopStartIndex = readFile.find("{{image_loop}}")
     loopEndIndex = readFile.find("{{image_end_loop}}")
     contentPlaceholder = readFile[loopStartIndex + 14:loopEndIndex]

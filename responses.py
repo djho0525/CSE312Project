@@ -47,9 +47,12 @@ def getResponse(path):
             content = content + line
         if db.getColor(currentUser[0]) == "light":
             content = content.replace("{{colorMode}}",'lightMode.css')
+            content = util.renderImages(content)
+            return response200("text/html", len(content), content.encode())
         else:
             content = content.replace("{{colorMode}}",'darkMode.css')
-        return response200("text/html",len(content),content.encode())
+            content = util.renderImages(content)
+            return response200("text/html", len(content), content.encode())
     elif path == "/lightMode.css":
         content = util.readBytes("static/lightMode.css")
         return response200("text/css", len(content), content)
@@ -81,7 +84,7 @@ def postResponse(server, path, received_data):
     # Body of image must not be decoded, data is decoded below
     if path == "/image-upload":
         util.imageUpload(server, received_data)
-        return response301("/posts")
+        return response301("/home")
 
     print("POST" + path)
     header, data = util.buffering(server, received_data)
