@@ -88,7 +88,10 @@ def getLikesByID(uploadID):
 def getLastIDNum():
     cur.execute("SELECT max(uploadID) FROM uploads")
     id = cur.fetchone()
-    return id[0]
+    if id[0] is not None:
+        return id[0]
+    else:
+        return 0
 
 def addLike(uploadID):
     currentLikes = getLikesByID(uploadID)

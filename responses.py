@@ -78,6 +78,11 @@ def getResponse(path):
 
 
 def postResponse(server, path, received_data):
+    # Body of image must not be decoded, data is decoded below
+    if path == "/image-upload":
+        util.imageUpload(server, received_data)
+        return response301("/posts")
+
     print("POST" + path)
     header, data = util.buffering(server, received_data)
     print(data)
@@ -131,6 +136,6 @@ def postResponse(server, path, received_data):
     elif path == "/upvote":
         imageID = int(str(form["uploadID"]).strip("image"))
         db.addLike(imageID)
-        return response404()
+        return response301("/posts")
     else:
         return response404()
