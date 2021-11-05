@@ -30,7 +30,7 @@
                         <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                          Active Users
                         </button>
-                        <div class="dropdown-menu" id='divActiveUsers' aria-labelledby="dropdownMenuButton">
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
                             <!--ActiveUsers-->
                         </div>
                     </div>
@@ -39,27 +39,6 @@
             </div>
         </div>
     </nav>
-
-    <div class="modal fade" id="modalDM">
-        <div class="modal-dialog modal-dialog-scrollable">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h4 class="modal-title">Chatting with {{user}}</h4>
-                    <button type="button" class="close" data-dismiss="modal">&#10005;</button>
-                </div>
-                <div class="modal-body">
-                    <p>chat messages will appear here ..........</p>
-                    {{modal_messages}}
-                </div>
-                <div class="modal-footer justify-content-start">
-                    <form action="messages?receiver={{receiver}}&sender={{sender}}" method="post">
-                        <input id="form-message" type="text" name="message" placeholder="Reply here ......"><br/>
-                        <input type="submit" value="Submit">
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
 
     <form action="/mode" id="changeMode" method="post">
             <!--<label for="lightModeCheckbox">Dark Theme</label>
