@@ -48,16 +48,16 @@ def addMessage(receiver, sender, message):
     users[receiver].messages[sender].append(message)
 
 def setupUploadsTable():
-    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, likes INT NOT NULL DEFAULT 0)")
+    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
 
 def resetUploadsTable():
-    cur.execute("DROP TABLE users")
+    cur.execute("DROP TABLE uploads")
     setupUploadsTable()
 
-def uploadImage(imagePath):
+def uploadImage(imagePath,caption):
     #First Column will be auto-incremented Image ID
     #May need to add column for number of likes
-    cur.execute("INSERT INTO uploads (imagepath) VALUES (%s)", (imagePath,))
+    cur.execute("INSERT INTO uploads (imagepath,caption) VALUES (%s,%s)", (imagePath,caption))
     db.commit()
 
 def getAllImages():
@@ -75,7 +75,7 @@ def getAllImagePaths():
     return imagesPaths
 
 def getImageByID(uploadID):
-    cur.execute("SELECT imagepath FROM uploads WHERE uploadID = (%s)", (uploadID,))
+    cur.execute("SELECT imagepath,caption FROM uploads WHERE uploadID = (%s)", (uploadID,))
     image = cur.fetchone()
     return image
 
@@ -85,6 +85,19 @@ def getLikesByID(uploadID):
     print(likes[0])
     return int(likes[0])
 
+def getLastIDNum():
+    cur.execute("SELECT max(uploadID) FROM uploads")
+    id = cur.fetchone()
+    if id[0] is not None:
+        return id[0]
+    else:
+        return 0
+
+def getLatest10Uploads():
+    cur.execute("SELECT * FROM cse312_project.uploads ORDER BY uploadID desc LIMIT 10")
+    latestUploads = cur.fetchall()
+    return latestUploads
+
 def addLike(uploadID):
     currentLikes = getLikesByID(uploadID)
     newLikes = currentLikes + 1
@@ -92,16 +105,50 @@ def addLike(uploadID):
     cur.execute("UPDATE uploads SET likes = (%s) WHERE uploadID = (%s)", (newLikes, uploadID))
     db.commit()
 
+def setupColorMode():
+    cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
+
+def resetColorModeTable():
+    cur.execute("DROP TABLE colormode")
+    setupColorMode()
+
+def insertDefaultColor(email):
+    cur.execute("INSERT INTO colormode(email,mode) VALUES(%s,%s)",(email,"light"))
+    db.commit()
+
+def updateColor(email,color):
+    email = email.replace("@","%40")
+    cur.execute("UPDATE colormode SET mode= (%s) WHERE email=(%s)",(color,email))
+    db.commit()
+
+def getColor(email):
+    email = email.replace("@","%40")
+    cur.execute("SELECT mode FROM colormode WHERE email=(%s)",(email,))
+    color = cur.fetchone()
+    return color[0]
+
 if __name__ == '__main__':
     # dropUserTable()
     # addUser('email@gmail.com', 'password', 'test')
     #uploadImage("/imageuploads/image1.jpg")
+    #resetTable()
+    setupTable()
+    #addUser('email@gmail.com', 'password', 'test')
+    #resetUploadsTable()
+    setupUploadsTable()
+    #uploadImage("/imageuploads/image1.jpg","hi")
+    #print(getImageByID(1)[0]#[1])
     #getAllImagePaths()
     #print(cur.fetchall())
+    #print(getLastIDNum())
     #getLikesByID(1)
     #addLike(1)
-    cur.execute("SELECT * FROM users")
-    for x in cur.fetchall(): print(x)
-    print(users)
-
+    #resetColorModeTable()
+    setupColorMode()
+    #print(getColor("da@gmail.com"))
+    #updateColor("da@gmail.com","dark")
+    #cur.execute("SELECT * FROM users")
+    #for x in cur.fetchall(): print(x)
+    #print(users)
+    print(getLatest10Uploads())
     db.close()

@@ -1,0 +1,64 @@
+body{
+    background-color:gold;
+}
+
+.form-group{
+    margin:auto;
+    margin-top: 10px;
+    padding: 10px;
+    border-style:solid;
+    border-width: 5px;
+    border-color: #212529;
+    border-radius: 10px;
+    width: 30%;
+    text-align: center;
+    background-color:gold;
+}
+
+.btn-primary{
+    color: black;
+    background-color: gold;
+    border-color: gold;
+    margin:5px;
+}
+
+.btn-primary:hover{
+    color: black;
+    background-color: goldenrod;
+    border-color: goldenrod;
+}
+
+.image-upload{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 500px;
+    height: 500px;
+    object-fit: contain;
+    border: 1px solid #3D3D3D;
+    border-radius: 5px;
+}
+
+.image-caption{
+    display: block;
+    color: black;
+    margin: auto;
+    width: 500px;
+}
+
+.like-button {
+    display: block;
+    margin: auto;
+    width: 500px;
+    background-color: #3D3D3D;
+    color: gold;
+    border: 2px solid #3D3D3D;
+    border-radius: 5px;
+}
+
+.like-button:hover {
+    background-color: #212529;
+    color: gold;
+    border: 2px solid #212529;
+    border-radius: 5px;
+}

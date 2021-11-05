@@ -1,8 +1,10 @@
 import login_signup
+import responses
 import util
 import database as db
 
 activeUsers = []
+currentUser = []
 
 def response200(con_type, length, content):  # input content has to be encoded
     return b"HTTP/1.1 200 OK\r\nContent-Type:" + con_type.encode() + b"\r\nX-Content-Type-Options: nosniff\r\nContent-Length: " + str(length).encode() + b"\r\n\r\n" + content + b"\r\n"
@@ -11,7 +13,7 @@ def response404():
     return b"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: " + str(len("The requested content does not exist")).encode() + b"\r\n\r\nThe requested content does not exist\r\n"
 
 def response301(location):
-    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + location + b"\r\n"
+    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + location.encode() + b"\r\n"
 
 
 
@@ -44,10 +46,29 @@ def getResponse(path):
                 for x in activeUsers:
                     line = line + x
             content = content + line
-        return response200("text/html",len(content),content.encode())
-    elif path == "/home.css":
-        content = util.readBytes("static/home.css")
+        if db.getColor(currentUser[0]) == "light":
+            content = content.replace("{{colorMode}}",'lightMode.css')
+            content = util.renderImages(content)
+            return response200("text/html", len(content), content.encode())
+        else:
+            content = content.replace("{{colorMode}}",'darkMode.css')
+            content = util.renderImages(content)
+            return response200("text/html", len(content), content.encode())
+    elif path == "/lightMode.css":
+        content = util.readBytes("static/lightMode.css")
         return response200("text/css", len(content), content)
+    elif path.find("/uploadedimage/") != -1:
+        content = util.hostImage(path)
+        if content is None:
+            return response404()
+        else:
+            return response200("image/jpeg", len(content),content)
+    elif path == "/darkMode.css":
+        content = util.readBytes("static/darkMode.css")
+        return response200("text/css", len(content), content)
+    elif path == "/home.js":
+        content = util.readBytes("static/home.js")
+        return response200("text/javascript", len(content), content)
     else:
         return response404()
 
@@ -57,19 +78,52 @@ def getResponse(path):
 
 
 def postResponse(server, path, received_data):
+    # Body of image must not be decoded, data is decoded below
+    if path == "/image-upload":
+        util.imageUpload(server, received_data)
+        return response301("/home")
+
     print("POST" + path)
     header, data = util.buffering(server, received_data)
     print(data)
-    form = util.parsing(data.decode())
-    print(form)
+    try:
+        form = util.parsing(data.decode())
+        print(form)
+    except ValueError:
+        print("SKIPPED PARSING")
     path, queries = util.querying(path)
 
     if path == "/login":
+        email, password = form['email'], form['password']
+        if db.userExists(email):
+            user = db.getUser(email)
+            if user.password == password:
+                email = email.replace("%40", "@")
+                activeUsers.append('<a class ="dropdown-item" href="#" >' + email + '</a>')
+                currentUser.clear()
+                currentUser.append(email)
+                return response301("/home")
+            else:
+                content = 'Login failed'
+        else:
+            content = 'Email is not registered'
+        content = content.encode()
+        return response200("text/plain", len(content), content)
         return login_signup.login(email=form['email'], password=form['password'])
     elif path == '/signUp':
         return login_signup.signup(name=form['name'], email=form['email'], password=form['password'], confirm_password=form['confirm_password'])
     elif path == "/image-upload":
         return response301("/")
+        name, email, password, confirm_password = form['name'], form['email'], form['password'], form['confirm_password']
+        if db.userExists(email): content = 'Email was already registered'
+        else:
+            if password == confirm_password:
+                db.addUser(email, password, name)
+                db.insertDefaultColor(email)
+                content = 'Created account successfully'
+            else: content = 'Passwords do not match'
+        content = content.encode()
+        return response200("text/plain", len(content), content)
     elif path == '/messages':
         receiver, sender, message = queries['receiver'], queries['sender'], form['message']
         db.addMessage(receiver, sender, message)
@@ -78,5 +132,14 @@ def postResponse(server, path, received_data):
         content = util.readBytes("templates/messages.html")
         content = content.decode().replace('{{message}}', messages).replace('{{receiver}}', receiver).replace("{{sender}}", sender).encode()
         return response200("text/html", len(content), content)
+    elif path == "/mode":
+        print(form["Mode"])
+        print(currentUser[0])
+        db.updateColor(currentUser[0],form["Mode"])
+        return response301("/home")
+    elif path == "/upvote":
+        imageID = int(str(form["uploadID"]).strip("image"))
+        db.addLike(imageID)
+        return response301("/home")
     else:
         return response404()
