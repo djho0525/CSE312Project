@@ -208,3 +208,6 @@ def querying(path):
         key, val = x.split('=')
         result[key] = val
     return path, result
+
+def escapeHTML(string):
+    return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
