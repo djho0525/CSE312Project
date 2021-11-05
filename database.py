@@ -4,15 +4,18 @@ from User import User
 
 u = 'sqluser'   # os.environ['DB_USERNAME']
 p = 'sqluserpassword'   # os.environ['DB_PASSWORD']
-db = mysql.connect(user=u, password=p, database='cse312_project')
+database = 'cse312_project'
+
+db = mysql.connect(user=u, password=p)
 cur = db.cursor(prepared=True)
+# INITIALIZE DATABASE AND TABLES
+cur.execute("CREATE DATABASE IF NOT EXISTS " + database)
+db.database = database
+cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
 
 users = {}      # {email: User object}
 
-def setupTable():
-    cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
-
-def resetTable():
+def dropUserTable():
     cur.execute("DROP TABLE users")
     setupTable()
 
@@ -93,7 +96,7 @@ def addLike(uploadID):
     db.commit()
 
 if __name__ == '__main__':
-    # resetTable()
+    # dropUserTable()
     # addUser('email@gmail.com', 'password', 'test')
     #uploadImage("/imageuploads/image1.jpg")
     #getAllImagePaths()
