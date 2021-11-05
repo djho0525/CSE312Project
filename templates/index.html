@@ -62,13 +62,12 @@
     <h1>Feed</h1>
 
     {{image_loop}}
-    <br>
-    <img src="{{image_filename}}"/>
-    <form action="/upvote" method="post">
-        <input type="hidden" value={{uploadID}} name="uploadID">
-        <input type="submit" value="Like">
-    </form>
-    <br>
+        <br>
+        <img class="image-upload" src="{{image_filename}}"/>
+        <form action="/upvote" method="post">
+            <input type="hidden" value={{uploadID}} name="uploadID">
+            <input class="like-button" type="submit" value="Like">
+        </form>
     {{image_end_loop}}
 </body>
 

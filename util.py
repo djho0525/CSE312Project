@@ -110,6 +110,7 @@ def imageUpload(server, receive):
     contentParts = contentParts[:len(contentParts) - 1]  # Removes -- from last boundary
     # print(contentParts)
     currentUploaderComment = ""
+    fileExtension = ".jpg"
     for part in contentParts:
         headersandbodyOfPart = part.split("\r\n\r\n".encode())
         decodedUnsplittedHeadersOfPart = headersandbodyOfPart[0].strip().decode("utf-8")
@@ -130,18 +131,23 @@ def imageUpload(server, receive):
                 currentUploaderComment += bodyOfPart.decode("utf-8")
                 print(currentUploaderComment)
         elif decodedHeadersDictOfPart.get("Content-Type") is not None and decodedHeadersDictOfPart.get("Content-Type").find("text/") == -1:
+            if decodedHeadersDictOfPart.get("Content-Disposition").get("extras").get("filename") is not None:
+                print("CHECKING IMAGE FILE TYPE THRU FILENAME")
+                filename = decodedHeadersDictOfPart.get("Content-Disposition").get("extras").get("filename").strip('"')
+                fileExtension = filename[len(filename)-len(".___"):]
+                print("FILE EXTENSION: " + fileExtension)
             if decodedHeadersDictOfPart.get("Content-Disposition").get("extras").get("name").strip('"') == "upload":
                 print("IMAGEUPLOAD PART")
                 print(currentUploaderComment)
                 imageNameCount += 1
-                f = open("imageUploads/" + "image" + str(imageNameCount) + ".jpg", "wb")
+                f = open("imageUploads/" + "image" + str(imageNameCount) + fileExtension, "wb")
                 f.write(bodyOfPart)
                 f.close()
                 currentUploaderComment = ""
     #currentUploaderComment = cleanMessage(currentUploaderComment)
-    imageUploads.append(currentUploaderComment + ":" + "image" + str(imageNameCount))
-    validFiles.append("image" + str(imageNameCount) + ".jpg")
-    db.uploadImage("imageUploads/" +"image"+str(imageNameCount),currentUploaderComment)
+    imageUploads.append(currentUploaderComment + ":" + "image" + str(imageNameCount) + fileExtension)
+    validFiles.append("image" + str(imageNameCount) + fileExtension)
+    db.uploadImage("imageUploads/" + "image" + str(imageNameCount) + fileExtension, currentUploaderComment)
     print("VALID FILES")
     print(validFiles)
     print(imageUploads)
@@ -161,13 +167,13 @@ def renderImages(html):
         imageName = image[1].split('/')[1]
         caption = image[2]
         likes = image[3]
-        currentImageTag = contentPlaceholder.replace("{{image_filename}}", "/uploadedimage/" + imageName + ".jpg")  # when browser receives our images.html it will make request(s) for the image(s) thru a request url of /image/<image_name> "/image/" is the path we told the browser to request in the html
+        currentImageTag = contentPlaceholder.replace("{{image_filename}}", "/uploadedimage/" + imageName)  # when browser receives our images.html it will make request(s) for the image(s) thru a request url of /image/<image_name> "/image/" is the path we told the browser to request in the html
         print(currentImageTag)
-        allImageTagsCaptionLikes += currentImageTag
-        allImageTagsCaptionLikes += "<label>Likes: "+str(likes)+"</label>"
-        allImageTagsCaptionLikes += "<br>"
-        allImageTagsCaptionLikes += "<label>"+caption+"</label>"
-        allImageTagsCaptionLikes = allImageTagsCaptionLikes.replace("{{uploadID}}","image"+str(imageID))
+        allImageTagsCaptionLikes += "<div class=" + "upload" + ">" + currentImageTag
+        allImageTagsCaptionLikes += "<p class="+"image-caption"+">" + "Likes ♥: " + str(likes) + "</p>"
+        #allImageTagsCaptionLikes += "<br>"
+        allImageTagsCaptionLikes += "<p class="+"image-caption"+">" + caption + "</p>" +"</div>"
+        allImageTagsCaptionLikes = allImageTagsCaptionLikes.replace("{{uploadID}}", "image"+str(imageID))
 
     readFile = readFile[:loopStartIndex] + allImageTagsCaptionLikes + readFile[loopEndIndex:]
     readFile = readFile.replace("{{image_loop}}", '')

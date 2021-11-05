@@ -28,3 +28,38 @@ body{
     background-color: goldenrod;
     border-color: goldenrod;
 }
+
+.image-upload{
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 500px;
+    height: 500px;
+    object-fit: contain;
+    border: 1px solid #3D3D3D;
+    border-radius: 5px;
+}
+
+.image-caption{
+    display: block;
+    color:gold;
+    margin: auto;
+    width: 500px;
+}
+
+.like-button {
+    display: block;
+    margin: auto;
+    width: 500px;
+    background-color: gold;
+    color: black;
+    border: 2px solid gold;
+    border-radius: 5px;
+}
+
+.like-button:hover {
+    background-color: goldenrod;
+    color: black;
+    border: 2px solid goldenrod;
+    border-radius: 5px;
+}

@@ -16,7 +16,6 @@ def resetTable():
     cur.execute("DROP TABLE users")
     setupTable()
 
-
 def addUser(email, password, name):
     cur.execute("INSERT INTO users (email, password, name) VALUES (%s, %s, %s)", (email, password, name))
     db.commit()
@@ -25,7 +24,6 @@ def addUser(email, password, name):
 def removeUser(email):
     cur.execute("DELETE FROM users WHERE email=%s", (email,))
     db.commit()
-
 
 def userExists(email):
     cur.execute("SELECT email FROM users")
@@ -51,7 +49,7 @@ def setupUploadsTable():
     cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
 
 def resetUploadsTable():
-    cur.execute("DROP TABLE users")
+    cur.execute("DROP TABLE uploads")
     setupUploadsTable()
 
 def uploadImage(imagePath,caption):
@@ -108,6 +106,10 @@ def addLike(uploadID):
 def setupColorMode():
     cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
 
+def resetColorModeTable():
+    cur.execute("DROP TABLE colormode")
+    setupColorMode()
+
 def insertDefaultColor(email):
     cur.execute("INSERT INTO colormode(email,mode) VALUES(%s,%s)",(email,"light"))
     db.commit()
@@ -124,9 +126,10 @@ def getColor(email):
     return color[0]
 
 if __name__ == '__main__':
-    # resetTable()
+    #resetTable()
     setupTable()
     #addUser('email@gmail.com', 'password', 'test')
+    #resetUploadsTable()
     setupUploadsTable()
     #uploadImage("/imageuploads/image1.jpg","hi")
     #print(getImageByID(1)[0]#[1])
@@ -135,6 +138,7 @@ if __name__ == '__main__':
     #print(getLastIDNum())
     #getLikesByID(1)
     #addLike(1)
+    #resetColorModeTable()
     setupColorMode()
     #print(getColor("da@gmail.com"))
     #updateColor("da@gmail.com","dark")
