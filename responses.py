@@ -35,11 +35,9 @@ def getResponse(server, path, received_data):
     elif path == "/jessehartloff.jpeg":
         content = util.readBytes("static/jessehartloff.jpeg")
         return response200("image/jpeg", len(content), content)
-    elif path == "/messages":
-        receiver, sender = queries['receiver'], queries['sender']
-        content = util.readBytes("templates/messages.html")
-        content = content.decode().replace('{{message}}', '').replace('{{receiver}}', receiver).replace("{{sender}}", sender).encode()
-        return response200("text/html", len(content), content)
+    elif path == "/messages" and "user" in queries:
+        sender = util.userFromCookies(header["Cookie"])
+        return direct_messaging.getResponse(sender, queries['user'])
     elif path == "/home":
         content = ""
         idxFile = open('templates/index.html', 'rt').readlines()
@@ -102,8 +100,9 @@ def postResponse(server, path, received_data):
         return login_signup.signup(name=form['name'], email=form['email'], password=form['password'], confirm_password=form['confirm_password'])
     elif path == "/image-upload":
         return response301("/")
-    elif path == '/messages':
-        return direct_messaging.postResponse(receiver=queries['receiver'], sender=queries['sender'], message=form['message'])
+    elif path == "/messages" and "user" in queries:
+        sender = util.userFromCookies(header["Cookie"])
+        return direct_messaging.postResponse(sender, queries['user'], form['message'])
     elif path == "/mode":
         print(form["Mode"])
         print(currentUser[0])
