@@ -29,17 +29,18 @@
     </nav>
 
     <div class="container">
-        <h2>Card Header and Footer</h2>
         <div class="card">
             <div class="card-header">
-                <h4>Chatting with {{user}}</h4>
+                <h4>Chatting with {{receiver}}</h4>
             </div>
             <div class="card-body">
-
+                {{messages}}
             </div>
             <div class="card-footer">
-                <input id="form-message" type="text" name="message" placeholder="Reply here ......"><br/>
-                <input type="submit" value="Submit">
+                <form action="/messages?user={{receiver}}" method="post">
+                    <input id="form-message" type="text" name="message" placeholder="Reply here ......"><br/>
+                    <input type="submit" value="Submit">
+                </form>
             </div>
         </div>
     </div>
