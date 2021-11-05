@@ -6,7 +6,7 @@ def login(email, password):
     if db.userExists(email):
         user = db.getUser(email)
         if user.password == password:
-            r.activeUsers.append('<a class ="dropdown-item" href="#" >' + email + '</a>')
+            r.activeUsers.append('<a class ="dropdown-item" href="#" data-toggle="modal" data-target="#modalDM">' + email + '</a>')
             db.loginUser(email)
             r.currentUser.clear()
             r.currentUser.append(email)
@@ -23,6 +23,7 @@ def signup(name, email, password, confirm_password):
     if db.userExists(email): print('Email was already registered')
     else:
         if password == confirm_password:
+            r.activeUsers.append('<a class ="dropdown-item" href="#" data-toggle="modal" data-target="#modalDM">' + email + '</a>')
             db.addUser(email, password, name)
             db.loginUser(email)
             db.insertDefaultColor(email)
