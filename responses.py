@@ -1,3 +1,4 @@
+import login_signup
 import util
 import database as db
 
@@ -64,29 +65,9 @@ def postResponse(server, path, received_data):
     path, queries = util.querying(path)
 
     if path == "/login":
-        email, password = form['email'], form['password']
-        if db.userExists(email):
-            user = db.getUser(email)
-            if user.password == password:
-                email = email.replace("%40", "@")
-                activeUsers.append('<a class ="dropdown-item" href="#" >' + email + '</a>')
-                return response301("/home".encode())
-            else:
-                content = 'Login failed'
-        else:
-            content = 'Email is not registered'
-        content = content.encode()
-        return response200("text/plain", len(content), content)
+        return login_signup.login(email=form['email'], password=form['password'])
     elif path == '/signUp':
-        name, email, password, confirm_password = form['name'], form['email'], form['password'], form['confirm_password']
-        if db.userExists(email): content = 'Email was already registered'
-        else:
-            if password == confirm_password:
-                db.addUser(email, password, name)
-                content = 'Created account successfully'
-            else: content = 'Passwords do not match'
-        content = content.encode()
-        return response200("text/plain", len(content), content)
+        return login_signup.signup(name=form['name'], email=form['email'], password=form['password'], confirm_password=form['confirm_password'])
     elif path == "/image-upload":
         return response301("/")
     elif path == '/messages':
