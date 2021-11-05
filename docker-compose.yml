@@ -3,13 +3,13 @@ services:
   mysql:
     image: mysql
     environment:
-      MYSQL_ROOT_PASSWORD: 'rootpassword'
+      MYSQL_ROOT_PASSWORD: 'change me'
       MYSQL_DATABASE: 'cse312_project'
       MYSQL_USER: 'sqluser'
-      MYSQL_PASSWORD: 'sqluserpassword'
+      MYSQL_PASSWORD: 'change me'
   app:
     build: .
     environment:
       WAIT_HOSTS: mysql:3306
       DB_USERNAME: 'sqluser'
-      DB_PASSWORD: 'sqluserpassword'
+      DB_PASSWORD: 'change me'
