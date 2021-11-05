@@ -17,32 +17,29 @@ users = {}      # {email: User object}
 
 def dropUserTable():
     cur.execute("DROP TABLE users")
-    setupTable()
-
 
 def addUser(email, password, name):
     cur.execute("INSERT INTO users (email, password, name) VALUES (%s, %s, %s)", (email, password, name))
     db.commit()
-    userSetup(email)
 
 def removeUser(email):
     cur.execute("DELETE FROM users WHERE email=%s", (email,))
     db.commit()
-
 
 def userExists(email):
     cur.execute("SELECT email FROM users")
     emails = list(i[0] for i in cur.fetchall())
     return email in emails
 
-def userSetup(email):
+def getUser(email):
     cur.execute("SELECT * FROM users WHERE email=%s", (email,))
     row = cur.fetchone()
-    if email not in users: users[email] = User(row[0], row[1], row[2])
+    return User(row[0], row[1], row[2])
 
-def getUser(email):
-    userSetup(email)
-    return users[email]
+def loginUser(email):
+    cur.execute("SELECT * FROM users WHERE email=%s", (email,))
+    row = cur.fetchone()
+    users[email] = User(row[0], row[1], row[2])
 
 def addMessage(receiver, sender, message):
     if receiver not in users[sender].messages: users[sender].messages[receiver] = []
