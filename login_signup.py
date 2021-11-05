@@ -6,11 +6,11 @@ def login(email, password):
     if db.userExists(email):
         user = db.getUser(email)
         if user.password == password:
-            r.activeUsers.append('<a class ="dropdown-item" href="#" data-toggle="modal" data-target="#modalDM">' + email + '</a>')
+            r.activeUsers[email] = '<a class ="dropdown-item" href="/messages?user=' + email + '">' + email + '</a>'
             db.loginUser(email)
             r.currentUser.clear()
             r.currentUser.append(email)
-            return r.response301("/home")
+            return r.response301("/home", "user=" + email)
         else:
             print('Login failed')
     else:
@@ -23,12 +23,12 @@ def signup(name, email, password, confirm_password):
     if db.userExists(email): print('Email was already registered')
     else:
         if password == confirm_password:
-            r.activeUsers.append('<a class ="dropdown-item" href="#" data-toggle="modal" data-target="#modalDM">' + email + '</a>')
+            r.activeUsers[email] = '<a class ="dropdown-item" href="/messages?user=' + email + '">' + email + '</a>'
             db.addUser(email, password, name)
             db.loginUser(email)
             db.insertDefaultColor(email)
             print('Created account successfully')
-            return r.response301("/home")
+            return r.response301("/home", "user=" + email)
         else: print('Passwords do not match')
     return r. response301("/")
 

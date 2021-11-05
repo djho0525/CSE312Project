@@ -3,7 +3,7 @@ import responses
 import util
 import database as db
 
-activeUsers = []
+activeUsers = {}
 currentUser = []
 
 def response200(con_type, length, content):  # input content has to be encoded
@@ -43,7 +43,7 @@ def getResponse(path):
         idxFile = open('templates/index.html', 'rt').readlines()
         for line in idxFile:
             if line.find("<!--ActiveUsers-->") != -1:
-                for x in activeUsers:
+                for x in activeUsers.values():
                     line = line + x
             content = content + line
         if db.getColor(currentUser[0]) == "light":
