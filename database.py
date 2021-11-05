@@ -12,6 +12,8 @@ cur = db.cursor(prepared=True)
 cur.execute("CREATE DATABASE IF NOT EXISTS " + database)
 db.database = database
 cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
+cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
+cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
 
 users = {}      # {email: User object}
 
@@ -117,12 +119,12 @@ def insertDefaultColor(email):
     db.commit()
 
 def updateColor(email,color):
-    email = email.replace("@","%40")
+    # email = email.replace("@","%40")
     cur.execute("UPDATE colormode SET mode= (%s) WHERE email=(%s)",(color,email))
     db.commit()
 
 def getColor(email):
-    email = email.replace("@","%40")
+    # email = email.replace("@","%40")
     cur.execute("SELECT mode FROM colormode WHERE email=(%s)",(email,))
     color = cur.fetchone()
     return color[0]
@@ -130,11 +132,7 @@ def getColor(email):
 if __name__ == '__main__':
     # dropUserTable()
     # addUser('email@gmail.com', 'password', 'test')
-    #uploadImage("/imageuploads/image1.jpg")
-    #resetTable()
-    setupTable()
-    #addUser('email@gmail.com', 'password', 'test')
-    #resetUploadsTable()
+    # removeUser('email@gmail.com')
     setupUploadsTable()
     #uploadImage("/imageuploads/image1.jpg","hi")
     #print(getImageByID(1)[0]#[1])
@@ -150,5 +148,5 @@ if __name__ == '__main__':
     #cur.execute("SELECT * FROM users")
     #for x in cur.fetchall(): print(x)
     #print(users)
-    print(getLatest10Uploads())
+    # print(getLatest10Uploads())
     db.close()
