@@ -1,4 +1,4 @@
-import login_signup
+import login_signup, direct_messaging
 import responses
 import util
 import database as db
@@ -100,13 +100,7 @@ def postResponse(server, path, received_data):
     elif path == "/image-upload":
         return response301("/")
     elif path == '/messages':
-        receiver, sender, message = queries['receiver'], queries['sender'], form['message']
-        db.addMessage(receiver, sender, message)
-        messages = ''
-        for i in db.users[receiver].messages[sender]: messages += i + '<br/>'
-        content = util.readBytes("templates/messages.html")
-        content = content.decode().replace('{{message}}', messages).replace('{{receiver}}', receiver).replace("{{sender}}", sender).encode()
-        return response200("text/html", len(content), content)
+        return direct_messaging.postResponse(receiver=queries['receiver'], sender=queries['sender'], message=form['message'])
     elif path == "/mode":
         print(form["Mode"])
         print(currentUser[0])
