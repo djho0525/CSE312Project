@@ -17,7 +17,6 @@ def buffering(server, received_data):
     content_len = int(header[3].split(' ')[1])        # Content-Length: num
     while content_len-len(body) > 0:
         body += server.request.recv(1024)
-    print(header[1:])
     return header[1:], body.strip()
 
 def parsing(data):
