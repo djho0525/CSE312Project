@@ -9,17 +9,19 @@ currentUser = []
 def response200(con_type, length, content):  # input content has to be encoded
     return b"HTTP/1.1 200 OK\r\nContent-Type:" + con_type.encode() + b"\r\nX-Content-Type-Options: nosniff\r\nContent-Length: " + str(length).encode() + b"\r\n\r\n" + content + b"\r\n"
 
-def response404():
-    return b"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: " + str(len("The requested content does not exist")).encode() + b"\r\n\r\nThe requested content does not exist\r\n"
+def response404(content='The requested content does not exist'):
+    return b"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: " + str(len(content)).encode() + b"\r\n\r\n" + content.encode()
 
-def response301(location):
-    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + location.encode() + b"\r\n"
+def response301(location, cookie=''):
+    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + location.encode() + b"\r\nSet-cookie: " + cookie.encode() + b"\r\n\r\n"
 
 
 
-def getResponse(path):
-    print("GET" + path)
+def getResponse(server, path, received_data):
+    print("GET " + path)
     path, queries = util.querying(path)
+    header, data = util.buffering(server, received_data)
+    header = util.parseHeaders(header)
 
     if path == "/":
         content = util.readBytes("templates/login.html")
@@ -83,15 +85,16 @@ def postResponse(server, path, received_data):
         util.imageUpload(server, received_data)
         return response301("/home")
 
-    print("POST" + path)
+    print("POST " + path)
+    path, queries = util.querying(path)
     header, data = util.buffering(server, received_data)
-    print(data)
+    header = util.parseHeaders(header)
+
     try:
         form = util.parsing(data.decode())
         print(form)
     except ValueError:
         print("SKIPPED PARSING")
-    path, queries = util.querying(path)
 
     if path == "/login":
         return login_signup.login(email=form['email'], password=form['password'])

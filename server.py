@@ -11,7 +11,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         request_line = received_data.strip().decode().split('\r\n')[0].split(' ')  # ie. ["GET", "/", "HTTP/1.1"]
         request_type, path = request_line[0], request_line[1]
 
-        if request_type == "GET": response = responses.getResponse(path)
+        if request_type == "GET": response = responses.getResponse(self, path, received_data)
         else: response = responses.postResponse(self, path, received_data)
 
         self.request.sendall(response)
