@@ -16,9 +16,10 @@ def buffering(server, received_data):
     data = received_data.split(b"\r\n\r\n", 1)
     header, body = data[0].strip().decode(), data[1]
     header = header.split('\r\n')
-    content_len = int(header[3].split(' ')[1])        # Content-Length: num
-    while content_len-len(body) > 0:
-        body += server.request.recv(1024)
+    if "Content-Length" in header[3]:
+        content_len = int(header[3].split(' ')[1])        # Content-Length: num
+        while content_len-len(body) > 0:
+            body += server.request.recv(1024)
     return header[1:], body.strip()
 
 def parsing(data):
@@ -43,14 +44,14 @@ def parseHeaders(headers):
             if value.count("; ") == 1:
                 headersDict[key]["extras"] = {}
                 extra = value[value.find("; ")+2:]
-                print(extra)
+                # print(extra)
                 extraKeyAndValue = extra.split("=")
                 extraKey = extraKeyAndValue[0]
                 extraValue = extraKeyAndValue[1]
                 headersDict[key]["extras"][extraKey] = extraValue
             else:
                 extraHeaders = value[value.find("; ")+2:].split("; ")
-                print(extraHeaders)
+                # print(extraHeaders)
                 headersDict[key]["extras"] = {}
                 for extra in extraHeaders:
                     extraKeyAndValue = extra.split("=")
@@ -59,7 +60,7 @@ def parseHeaders(headers):
                     headersDict[key]["extras"][extraKey] = extraValue
         else:
             headersDict[key] = value
-    print(headersDict)
+    # print(headersDict)
     return headersDict
 
 imageUploads = []
@@ -211,3 +212,6 @@ def querying(path):
 
 def escapeHTML(string):
     return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
+
+def userFromCookies(string):
+    return string.split("; ")[1].split("=")[1]
