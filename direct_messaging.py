@@ -14,3 +14,10 @@ def getResponse(sender, receiver):
     else:
         return r.response404("User " + receiver + " does not exist or is inactive")
 
+def postResponse(sender, receiver, message):
+    receiver = receiver.replace("%40", "@")
+    if receiver in r.activeUsers:
+        db.addMessage(sender, receiver, message)
+        return r.response301("/messages?user=" + receiver)
+    else:
+        r.response404("User " + receiver + " does not exist or is inactive")
