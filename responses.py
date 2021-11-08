@@ -54,7 +54,7 @@ def getResponse(server, path, received_data):
         else:
             content = content.replace("{{colorMode}}",'darkMode.css')
             content = util.renderImages(content)
-        return response200("text/html", len(content), content.encode())
+            return response200("text/html", len(content), content.encode())
     elif path == "/lightMode.css":
         content = util.readBytes("static/lightMode.css")
         return response200("text/css", len(content), content)
