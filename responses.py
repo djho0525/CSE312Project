@@ -73,6 +73,8 @@ def getResponse(server, path, received_data):
     elif path == "/websocket":
         socketKey = header["Sec-WebSocket-Key"] + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
         base64_string = base64.b64encode(hashlib.sha1(socketKey.encode()).digest()).decode()
+        user = util.userFromCookies(header["Cookie"])
+        activeUsers[server] = user
 
         response = "HTTP/1.1 101 Switching Protocols\r\nConnection:Upgrade\r\nUpgrade:websocket\r\nSec-WebSocket-Accept:" + base64_string + "\r\n\r\n  "
         return response.encode()
@@ -86,7 +88,9 @@ def webSocketConnection(server):
             frame = util.webSocketFrameParser(recData)
             if frame["opcode"] == 8:
                 print(activeUsers)
+                if server in activeUsers: print("removing " + activeUsers[server] + " from active users list")
                 activeUsers.pop(server)
+                if server not in activeUsers: print("user successfully removed")
                 print(activeUsers)
 
 

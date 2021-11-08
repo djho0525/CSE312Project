@@ -6,7 +6,7 @@ def login(server, email, password):
     if db.userExists(email):
         user = db.getUser(email)
         if user.password == password:
-            r.activeUsers[server] = email
+            # r.activeUsers[server] = email
             db.loginUser(email)
             r.currentUser.clear()
             r.currentUser.append(email)
@@ -23,7 +23,7 @@ def signup(server, name, email, password, confirm_password):
     if db.userExists(email): print('Email was already registered')
     else:
         if password == confirm_password:
-            r.activeUsers[server] = email
+            # r.activeUsers[server] = email
             db.addUser(email, password, name)
             db.loginUser(email)
             db.insertDefaultColor(email)
