@@ -5,7 +5,7 @@ import login_signup, direct_messaging
 import util
 import database as db
 
-activeUsers = {}  # client id mapped to email
+activeUsers = {}  # server mapped to email
 currentUser = []
 
 def response200(con_type, length, content):  # input content has to be encoded
