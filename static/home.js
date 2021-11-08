@@ -2,6 +2,13 @@ function enableButton(){
     let button = document.getElementById("submit-mode")
     button.disabled=false
 }
+
+const socket = new WebSocket('ws://' + window.location.host + '/websocket');
+
+function signOut(){
+    fetch('http://' + window.location.host  +  '/logout')
+}
+
 /*var useDarkTheme = localStorage.getItem("LightDark") === "dark";
 setDarkMode(useDarkTheme);
 

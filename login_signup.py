@@ -1,12 +1,12 @@
 import database as db
 import responses as r
 
-def login(email, password):
+def login(server, email, password):
     email = email.replace("%40", "@")
     if db.userExists(email):
         user = db.getUser(email)
         if user.password == password:
-            r.activeUsers[email] = '<a class ="dropdown-item" href="/messages?user=' + email + '">' + email + '</a>'
+            r.activeUsers[server] = email
             db.loginUser(email)
             r.currentUser.clear()
             r.currentUser.append(email)
@@ -18,12 +18,12 @@ def login(email, password):
     return r.response301("/")
 
 
-def signup(name, email, password, confirm_password):
+def signup(server, name, email, password, confirm_password):
     email = email.replace("%40", "@")
     if db.userExists(email): print('Email was already registered')
     else:
         if password == confirm_password:
-            r.activeUsers[email] = '<a class ="dropdown-item" href="/messages?user=' + email + '">' + email + '</a>'
+            r.activeUsers[server] = email
             db.addUser(email, password, name)
             db.loginUser(email)
             db.insertDefaultColor(email)

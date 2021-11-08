@@ -15,6 +15,9 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         else: response = responses.postResponse(self, path, received_data)
 
         self.request.sendall(response)
+        if path == "/websocket":  # establish a websocket connection after serving the home page
+            print("hello")
+            responses.webSocketConnection(self)
 
 
 if __name__ == "__main__":
