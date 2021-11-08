@@ -54,16 +54,32 @@
         <input type="submit" id="submit-mode" disabled="true" value="Submit">
     </form>
 
-    <form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
-        <input value={{xsrftoken}} name="xsrf_token" hidden>
-        <label for="form-file">Image: </label>
-        <input id="form-file" type="file" name="upload">
-        <br/>
-        <label for="image-form-name">Caption: </label>
-        <input id="image-form-name" type="text" name="caption">
-        <input type="submit" value="Submit">
-    </form>
-    <h1>Feed</h1>
+    <button type="button" class="upload-button" data-toggle="modal" data-target="#myModal">Upload Image</button>
+    <!-- Modal -->
+    <div id="myModal" class="modal fade" role="dialog">
+      <div class="modal-dialog">
+
+        <!-- Modal content-->
+        <div class="modal-content">
+            <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal">&times;</button>
+            </div>
+                <form action="/image-upload" id="image-form" method="post" enctype="multipart/form-data">
+                    <input value={{xsrftoken}} name="xsrf_token" hidden>
+                    <label for="form-file" class="upload-form-text">Image: </label>
+                    <input id="form-file" type="file" name="upload">
+                    <br/>
+                    <label for="image-form-name" class="upload-form-text">Caption: </label>
+                    <input id="image-form-name" type="text" name="caption">
+                    <input class="upload-submit-button" type="submit" value="Submit">
+                </form>
+            <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+      </div>
+    </div>
+
 
     {{image_loop}}
         <br>
