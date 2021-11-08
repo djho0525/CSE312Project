@@ -5,7 +5,7 @@ import login_signup, direct_messaging
 import util
 import database as db
 
-activeUsers = {}  # client id mapped to email
+activeUsers = {}  # server mapped to email
 currentUser = []
 
 def response200(con_type, length, content):  # input content has to be encoded
@@ -47,13 +47,13 @@ def getResponse(server, path, received_data):
                 for x in activeUsers.values():
                     line = line + '<a class ="dropdown-item" href="/messages?user=' + x + '">' + x + '</a>'
             content = content + line
-        #if db.getColor(currentUser[0]) == "light":
-           # content = content.replace("{{colorMode}}",'lightMode.css')
-           # content = util.renderImages(content)
-           # return response200("text/html", len(content), content.encode())
-       # else:
-          #  content = content.replace("{{colorMode}}",'darkMode.css')
-           # content = util.renderImages(content)
+        if db.getColor(currentUser[0]) == "light":
+            content = content.replace("{{colorMode}}",'lightMode.css')
+            content = util.renderImages(content)
+            return response200("text/html", len(content), content.encode())
+        else:
+            content = content.replace("{{colorMode}}",'darkMode.css')
+            content = util.renderImages(content)
         return response200("text/html", len(content), content.encode())
     elif path == "/lightMode.css":
         content = util.readBytes("static/lightMode.css")

@@ -135,7 +135,8 @@ def getColor(email):
     # email = email.replace("@","%40")
     cur.execute("SELECT mode FROM colormode WHERE email=(%s)",(email,))
     color = cur.fetchone()
-    return color[0]
+    if color is not None:
+        return color[0]
 
 if __name__ == '__main__':
     # dropUserTable()
