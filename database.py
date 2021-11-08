@@ -137,6 +137,8 @@ def getColor(email):
     color = cur.fetchone()
     if color is not None:
         return color[0]
+    else:
+        return 0
 
 if __name__ == '__main__':
     # dropUserTable()
