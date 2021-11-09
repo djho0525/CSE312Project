@@ -81,18 +81,6 @@ def getResponse(server, path, received_data):
     else:
         return response404()
 
-def webSocketConnection(server):
-    while True:
-        recData = server.request.recv(2048)
-        if len(recData) > 0:
-            frame = util.webSocketFrameParser(recData)
-            if frame["opcode"] == 8:
-                print(activeUsers)
-                if server in activeUsers: print("removing " + activeUsers[server] + " from active users list")
-                activeUsers.pop(server)
-                if server not in activeUsers: print("user successfully removed")
-                print(activeUsers)
-
 
 def postResponse(server, path, received_data):
     # Body of image must not be decoded, data is decoded below
