@@ -215,36 +215,3 @@ def escapeHTML(string):
 
 def userFromCookies(string):
     return string.split("; ")[1].split("=")[1]
-
-def webSocketFrameParser(frame):
-    retVal = {}
-    retVal["opcode"] = frame[0] & 15
-    retVal["fin"] = (frame[0] & 128) >> 7
-    maskBit = (frame[1] & 128) >> 7
-
-    payloadLen = int.from_bytes(frame[1:2], 'big') & 127
-    currentByte = 2
-    if payloadLen == 126:
-        payloadLen = int.from_bytes(frame[2:3] + frame[3:4], 'big')
-        currentByte = 4
-    elif payloadLen == 127:
-        payloadLen = b''
-        for x in range(2, 10):
-            payloadLen += frame[x:x+1]
-        payloadLen = int.from_bytes(payloadLen, 'big')
-        currentByte = 11
-
-    if maskBit == 1:
-        mask = [frame[currentByte:currentByte+1], frame[currentByte+1:currentByte+2], frame[currentByte+2:currentByte+3], frame[currentByte+3:currentByte+4]]
-        currentByte += 4
-
-        byteNum = 1
-        payload = b''
-        for x in range(currentByte, currentByte + payloadLen):
-            maskPiece = (byteNum % 4) - 1
-            if maskPiece == -1: maskPiece = 3
-
-            payload += (int.from_bytes(frame[x:x+1], 'big') ^ int.from_bytes(mask[maskPiece], 'big')).to_bytes(1, 'big')
-            byteNum += 1
-        retVal["data"] = payload
-        return retVal
