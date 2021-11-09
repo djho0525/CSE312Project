@@ -38,8 +38,10 @@ def getResponse(server, path, received_data):
         content = util.readBytes("static/jessehartloff.jpeg")
         return response200("image/jpeg", len(content), content)
     elif path == "/messages" and "user" in queries:
-        sender = util.userFromCookies(header["Cookie"])
-        return direct_messaging.getResponse(sender, queries['user'])
+        return direct_messaging.getResponse(serverToUser[server], queries['user'])
+    elif path == "/direct_messaging.js":
+        content = util.readBytes("static/direct_messaging.js")
+        return response200("text/javascript", len(content), content)
     elif path == "/home":
         content = ""
         idxFile = open('templates/index.html', 'rt').readlines()
@@ -74,8 +76,6 @@ def getResponse(server, path, received_data):
     elif path == "/websocket":
         socketKey = header["Sec-WebSocket-Key"] + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
         base64_string = base64.b64encode(hashlib.sha1(socketKey.encode()).digest()).decode()
-        user = util.userFromCookies(header["Cookie"])
-        activeUsers[server] = user
 
         response = "HTTP/1.1 101 Switching Protocols\r\nConnection:Upgrade\r\nUpgrade:websocket\r\nSec-WebSocket-Accept:" + base64_string + "\r\n\r\n  "
         return response.encode()
@@ -96,7 +96,7 @@ def postResponse(server, path, received_data):
 
     try:
         form = util.parsing(data.decode())
-        print(form)
+        # print(form)
     except ValueError:
         print("SKIPPED PARSING")
 
@@ -106,9 +106,6 @@ def postResponse(server, path, received_data):
         return login_signup.signup(server, name=form['name'], email=form['email'], password=form['password'], confirm_password=form['confirm_password'])
     elif path == "/image-upload":
         return response301("/")
-    elif path == "/messages" and "user" in queries:
-        sender = util.userFromCookies(header["Cookie"])
-        return direct_messaging.postResponse(sender, queries['user'], form['message'])
     elif path == "/mode":
         print(form["Mode"])
         print(currentUser[0])

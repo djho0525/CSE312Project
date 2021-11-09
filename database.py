@@ -45,16 +45,13 @@ def loginUser(email):
 
 def addMessage(sender, receiver, message):
     if receiver not in users[sender].messages or sender not in users[receiver].messages:
-        users[sender].messages[receiver] = []
-        users[receiver].messages[sender] = []
+        users[sender].messages[receiver], users[receiver].messages[sender] = [], []
     users[sender].messages[receiver].append({'user': sender, 'content': message})
     users[receiver].messages[sender].append({'user': sender, 'content': message})
 
 def getMessages(sender, receiver):
-    print(sender, receiver, users)
     if sender not in users[receiver].messages or receiver not in users[sender].messages:
-        users[receiver].messages[sender] = []
-        users[sender].messages[receiver] = []
+        users[receiver].messages[sender], users[sender].messages[receiver] = [], []
     return users[receiver].messages[sender]
 
 def setupUploadsTable():

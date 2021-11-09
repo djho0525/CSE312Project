@@ -17,10 +17,7 @@ def getResponse(sender, receiver):
     else:
         return r.response404("User " + receiver + " does not exist or is inactive")
 
-def postResponse(sender, receiver, message):
-    receiver = receiver.replace("%40", "@")
-    if receiver in r.activeUsers.values():
-        db.addMessage(sender, receiver, message)
-        return r.response301("/messages?user=" + receiver)
-    else:
-        r.response404("User " + receiver + " does not exist or is inactive")
+def newMessage(sender, message):
+    receiver = active_chatrooms[sender]
+    db.addMessage(sender, receiver, message)
+    return sender, receiver
