@@ -7,6 +7,7 @@ import database as db
 
 activeUsers = {}  # server mapped to email
 currentUser = []
+storedUser, serverToUser, userToServer = None, {}, {}
 
 def response200(con_type, length, content):  # input content has to be encoded
     return b"HTTP/1.1 200 OK\r\nContent-Type:" + con_type.encode() + b"\r\nX-Content-Type-Options: nosniff\r\nContent-Length: " + str(length).encode() + b"\r\n\r\n" + content + b"\r\n"

@@ -1,5 +1,6 @@
 import socketserver
-import responses
+import responses as r
+import WebSocketHandler
 
 class MyTCPHandler(socketserver.BaseRequestHandler):
 
@@ -11,12 +12,18 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         request_line = received_data.strip().decode().split('\r\n')[0].split(' ')  # ie. ["GET", "/", "HTTP/1.1"]
         request_type, path = request_line[0], request_line[1]
 
-        if request_type == "GET": response = responses.getResponse(self, path, received_data)
-        else: response = responses.postResponse(self, path, received_data)
+        if r.storedUser in r.userToServer:
+            s = r.userToServer.pop(r.storedUser)
+            r.userToServer[r.storedUser] = s
+            r.serverToUser[self] = r.storedUser
+            print(r.storedUser + " made a request:")
+
+        if request_type == "GET": response = r.getResponse(self, path, received_data)
+        else: response = r.postResponse(self, path, received_data)
 
         self.request.sendall(response)
         if path == "/websocket":  # establish a websocket connection after serving the home page
-            responses.webSocketConnection(self)
+            WebSocketHandler.webSocketConnection(self)
 
 
 if __name__ == "__main__":

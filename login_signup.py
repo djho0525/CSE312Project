@@ -10,6 +10,11 @@ def login(server, email, password):
             db.loginUser(email)
             r.currentUser.clear()
             r.currentUser.append(email)
+
+            r.serverToUser[server] = email
+            r.userToServer[email] = server
+            r.storedUser = email
+
             return r.response301("/home", "user=" + email)
         else:
             print('Login failed')
@@ -27,7 +32,14 @@ def signup(server, name, email, password, confirm_password):
             db.addUser(email, password, name)
             db.loginUser(email)
             db.insertDefaultColor(email)
+            r.currentUser.clear()
+            r.currentUser.append(email)
             print('Created account successfully')
+
+            r.serverToUser[server] = email
+            r.userToServer[email] = server
+            r.storedUser = email
+
             return r.response301("/home", "user=" + email)
         else: print('Passwords do not match')
     return r. response301("/")
