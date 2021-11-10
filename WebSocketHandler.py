@@ -5,20 +5,24 @@ import direct_messaging
 
 webSocketClients = []
 
-def webSocketConnection(server):
-    print(r.storedUser + " has connected")
-    if r.storedUser not in r.activeUsers:
-        r.activeUsers.append(r.storedUser)
+def webSocketConnection(server, userFromCookie):
+    r.serverToUser.pop( r.userToServer.pop(userFromCookie) )
+    r.userToServer[userFromCookie], r.serverToUser[server] = server, userFromCookie
+    print(userFromCookie + " has connected")
+
+    if userFromCookie not in r.activeUsers:
+        r.activeUsers.append(userFromCookie)
+
     while True:
         recData = server.request.recv(2048)
         if len(recData) > 0:
             frame = webSocketFrameParser(recData)
             if frame["opcode"] == 8:
-                print(r.storedUser + " has disconnected")
+                print(userFromCookie + " has disconnected")
                 webSocketClients.remove(server)
-                if r.storedUser in r.activeUsers:
-                    r.activeUsers.remove(r.storedUser)
-                    print("removed " + r.storedUser + " from active users list")
+                if userFromCookie in r.activeUsers:
+                    r.activeUsers.remove(userFromCookie)
+                    print("removed " + userFromCookie + " from active users list")
                 break
 
             elif frame["opcode"] == 1:
@@ -40,11 +44,12 @@ def webSocketConnection(server):
                         client.request.sendall(frameToSend)
                 if "listener" in content.keys():
                     if content["listener"] == "direct_message":
-                        sender, receiver = direct_messaging.newMessage(r.serverToUser[server], content["message"])
+                        sender, receiver = direct_messaging.newMessage(userFromCookie, content["message"])
                         clients = [r.userToServer[sender], r.userToServer[receiver]]
-                        sendFrame = createWebSocketFrame(content["message"])
-                        r.userToServer[sender].request.sendall(sendFrame)
-                        print("is it stopping here?")
+                        sendFrame = createWebSocketFrame(json.dumps({"message": content["message"], "sender": sender}))
+                        for client in clients:
+                            print(clients)
+                            client.request.sendall(sendFrame)
 
 
 

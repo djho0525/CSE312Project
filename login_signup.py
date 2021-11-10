@@ -12,8 +12,7 @@ def login(server, email, password):
 
             r.serverToUser[server] = email
             r.userToServer[email] = server
-            r.storedUser = email
-            r.activeUsers.append(r.storedUser)
+            r.activeUsers.append(email)
 
             return r.response301("/home", "user=" + email)
         else:
@@ -38,8 +37,7 @@ def signup(server, name, email, password, confirm_password):
 
             r.serverToUser[server] = email
             r.userToServer[email] = server
-            r.storedUser = email
-            r.activeUsers.append(r.storedUser)
+            r.activeUsers.append(email)
 
             return r.response301("/home", "user=" + email)
         else: print('Passwords do not match')

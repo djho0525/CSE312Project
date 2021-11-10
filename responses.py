@@ -8,7 +8,7 @@ import WebSocketHandler
 
 activeUsers = []
 currentUser = []
-storedUser, serverToUser, userToServer = None, {}, {}
+serverToUser, userToServer = {}, {}
 
 def response200(con_type, length, content):  # input content has to be encoded
     return b"HTTP/1.1 200 OK\r\nContent-Type:" + con_type.encode() + b"\r\nX-Content-Type-Options: nosniff\r\nContent-Length: " + str(length).encode() + b"\r\n\r\n" + content + b"\r\n"
@@ -25,12 +25,12 @@ def getResponse(server, path, received_data):
     path, queries = util.querying(path)
     header, data = util.buffering(server, received_data)
     header = util.parseHeaders(header)
-    storedUser = util.userFromCookies(header)
+    userFromCookie = util.userFromCookies(header)
 
-    if storedUser in userToServer:
-        serverToUser.pop( userToServer.pop(storedUser) )
-        userToServer[storedUser], serverToUser[server] = server, storedUser
-    print(storedUser + " requested the data above")
+    if userFromCookie in userToServer:
+        serverToUser.pop( userToServer.pop(userFromCookie) )
+    userToServer[userFromCookie], serverToUser[server] = server, userFromCookie
+    print(userFromCookie + " requested the data above")
 
 
     if path == "/":
@@ -46,7 +46,7 @@ def getResponse(server, path, received_data):
         content = util.readBytes("static/jessehartloff.jpeg")
         return response200("image/jpeg", len(content), content)
     elif path == "/messages" and "user" in queries:
-        return direct_messaging.getResponse(storedUser, queries['user'])
+        return direct_messaging.getResponse(userFromCookie, queries['user'])
     elif path == "/direct_messaging.js":
         content = util.readBytes("static/direct_messaging.js")
         return response200("text/javascript", len(content), content)
@@ -58,7 +58,7 @@ def getResponse(server, path, received_data):
                 for x in activeUsers:
                     line = line + '<a class ="dropdown-item" href="/messages?user=' + x + '">' + x + '</a>'
             content = content + line
-        if db.getColor(storedUser) == "light":
+        if db.getColor(userFromCookie) == "light":
             content = content.replace("{{colorMode}}",'lightMode.css')
             content = util.renderImages(content)
             return response200("text/html", len(content), content.encode())
@@ -102,12 +102,12 @@ def postResponse(server, path, received_data):
     path, queries = util.querying(path)
     header, data = util.buffering(server, received_data)
     header = util.parseHeaders(header)
-    storedUser = util.userFromCookies(header)
+    userFromCookie = util.userFromCookies(header)
 
-    if storedUser in userToServer:
-        serverToUser.pop( userToServer.pop(storedUser) )
-    userToServer[storedUser], serverToUser[server] = server, storedUser
-    print(storedUser + " requested the data above")
+    if userFromCookie in userToServer:
+        serverToUser.pop( userToServer.pop(userFromCookie) )
+    userToServer[userFromCookie], serverToUser[server] = server, userFromCookie
+    print(userFromCookie + " requested the data above")
 
     try:
         form = util.parsing(data.decode())
@@ -123,8 +123,8 @@ def postResponse(server, path, received_data):
     elif path == "/image-upload":
         return response301("/")
     elif path == "/mode":
-        # print(storedUser + " has made a request for ")
-        db.updateColor(storedUser, form["Mode"])
+        # print(userFromCookie + " has made a request for ")
+        db.updateColor(userFromCookie, form["Mode"])
         return response301("/home")
     #elif path == "/upvote":
         #imageID = int(str(form["uploadID"]).strip("image"))
