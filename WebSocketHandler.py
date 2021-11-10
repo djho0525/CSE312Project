@@ -23,7 +23,7 @@ def webSocketConnection(server):
 
             elif frame["opcode"] == 1:
                 content = json.loads(bytes(frame["data"]).decode())
-                if "imageid" in content:
+                if "imageid" in content.keys():
                     #print(b"TESTING LIVE UPVOTES" + frame["data"])
                     imageid = str(content["imageid"]).replace("image","")
                     #print("Image ID to upvote: " + imageid)
@@ -38,7 +38,7 @@ def webSocketConnection(server):
                     for client in webSocketClients:
                         #print("Websocket Client: " + str(client))
                         client.request.sendall(frameToSend)
-                if "listener" in content:
+                if "listener" in content.keys():
                     if content["listener"] == "direct_message":
                         sender, receiver = direct_messaging.newMessage(r.serverToUser[server], content["message"])
                         clients = [r.userToServer[sender], r.userToServer[receiver]]

@@ -108,12 +108,12 @@ def getLatest10Uploads():
 def addLike(uploadID):
     currentLikes = getLikesByID(uploadID)
     newLikes = currentLikes + 1
-    print(newLikes)
+    #print(newLikes)
     cur.execute("UPDATE uploads SET likes = (%s) WHERE uploadID = (%s)", (newLikes, uploadID))
     db.commit()
 
 def addLikeLive(uploadID, newNumLikes):
-    print(newNumLikes)
+    #print(newNumLikes)
     cur.execute("UPDATE uploads SET likes = (%s) WHERE uploadID = (%s)", (newNumLikes, uploadID))
     db.commit()
 
