@@ -6,10 +6,10 @@ import direct_messaging
 webSocketClients = []
 
 def webSocketConnection(server):
-    print(r.storedUser + " has connected")
+    # print(r.storedUser + " has connected")
     if r.storedUser not in r.activeUsers:
         r.activeUsers.append(r.storedUser)
-    r.storedUser = ''
+    # r.storedUser = ''
     while True:
         recData = server.request.recv(2048)
         if len(recData) > 0:
