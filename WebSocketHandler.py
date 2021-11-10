@@ -1,6 +1,9 @@
+import database
 import responses as r
 import json
 import direct_messaging
+
+webSocketClients = []
 
 def webSocketConnection(server):
     print(r.storedUser + " has connected")
@@ -21,13 +24,29 @@ def webSocketConnection(server):
 
             elif frame["opcode"] == 1:
                 content = json.loads(bytes(frame["data"]).decode())
+                if "imageid" in content:
+                    #print(b"TESTING LIVE UPVOTES" + frame["data"])
+                    imageid = str(content["imageid"]).replace("image","")
+                    #print("Image ID to upvote: " + imageid)
+                    #print("Number of Likes: " + content["likes"])
+                    newNumLikes = int(content["likes"]) + 1
+                    database.addLikeLive(imageid,newNumLikes)
+                    tempUpvoteDict = {"imageid":str(content["imageid"]),"likes":str(newNumLikes)}
+                    jsonFormattedNewUpvote = json.dumps(tempUpvoteDict)
+                    #print(jsonFormattedNewUpvote)
+                    frameToSend = createWebSocketFrame(jsonFormattedNewUpvote)
+                    #print(frameToSend)
+                    for client in webSocketClients:
+                        #print("Websocket Client: " + str(client))
+                        client.request.sendall(frameToSend)
+                if "listener" in content:
+                    if content["listener"] == "direct_message":
+                        sender, receiver = direct_messaging.newMessage(r.serverToUser[server], content["message"])
+                        clients = [r.userToServer[sender], r.userToServer[receiver]]
+                        sendFrame = createWebSocketFrame(content["message"])
+                        r.userToServer[sender].request.sendall(sendFrame)
+                        print("is it stopping here?")
 
-                if content["listener"] == "direct_message":
-                    sender, receiver = direct_messaging.newMessage(r.serverToUser[server], content["message"])
-                    clients = [r.userToServer[sender], r.userToServer[receiver]]
-                    sendFrame = createWebSocketFrame(content["message"])
-                    r.userToServer[sender].request.sendall(sendFrame)
-                    print("is it stopping here?")
 
 
 def webSocketFrameParser(frame):
@@ -62,8 +81,6 @@ def webSocketFrameParser(frame):
             byteNum += 1
         retVal["data"] = payload
         return retVal
-
-
 
 def createWebSocketFrame(content):
     payload = bytes(content.encode())

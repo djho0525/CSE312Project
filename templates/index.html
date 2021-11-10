@@ -84,10 +84,10 @@
     {{image_loop}}
         <br>
         <img class="image-upload" src="{{image_filename}}"/>
-        <form action="/upvote" method="post">
+        <!--<form action="/upvote" method="post">-->
             <input type="hidden" value={{uploadID}} name="uploadID">
-            <input class="like-button" type="submit" value="Like">
-        </form>
+            <input class="like-button" type="submit" value="Like" onclick="sendMessage({{imageToLikeID}})">
+        <!--</form>-->
     {{image_end_loop}}
 </body>
 

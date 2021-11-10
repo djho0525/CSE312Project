@@ -112,6 +112,11 @@ def addLike(uploadID):
     cur.execute("UPDATE uploads SET likes = (%s) WHERE uploadID = (%s)", (newLikes, uploadID))
     db.commit()
 
+def addLikeLive(uploadID, newNumLikes):
+    print(newNumLikes)
+    cur.execute("UPDATE uploads SET likes = (%s) WHERE uploadID = (%s)", (newNumLikes, uploadID))
+    db.commit()
+
 def setupColorMode():
     cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
 
