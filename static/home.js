@@ -9,36 +9,25 @@ function signOut(){
     fetch('http://' + window.location.host  +  '/logout')
 }
 
-/*var useDarkTheme = localStorage.getItem("LightDark") === "dark";
-setDarkMode(useDarkTheme);
+// Call the updateVote function whenever data is received from the server over the WebSocket
+socket.onmessage = updateVote;
 
-function loadBody(){
-    let prevState = document.getElementById("lightModeCheckbox")
-    if (localStorage.getItem("LightDark")=="dark") {
-        prevState.checked = true
-    }
+// Read the name/comment the user is sending to chat and send it to the server over the WebSocket as a JSON string
+// Called whenever the user clicks the Like button
+function sendMessage(imageToLikeID) {
+    //console.log(imageToLikeID)
+    const likesCaptionElement = document.getElementById(imageToLikeID)
+    const numLikesWithText = likesCaptionElement.innerHTML
+    const numLikes = numLikesWithText.slice("Likes ♥: ".length)
+    //console.log("NUMBER OF LIKES FROM ELEMENTID: " + numLikes)
+    socket.send(JSON.stringify({'imageid': imageToLikeID, 'likes': numLikes}));
 }
-function setDarkMode(darkMode){
-    console.log(darkMode)
-    if(darkMode == true) {
-        //document.cookie = "LightDark=dark";
-        localStorage.setItem("LightDark", "dark")
-    }
-    else{
-        localStorage.setItem("LightDark", "light")
-    }
-    if(localStorage.getItem("LightDark") == "dark"){
-        let lightModeOFF = document.getElementById("lightMode")
-        lightModeOFF.disabled = true
-        let darkModeOFF = document.getElementById("darkMode")
-        darkModeOFF.disabled = false
-        localStorage.setItem("LightDark", "dark")
-    }
-    else if(localStorage.getItem("LightDark") == "light"){
-        let darkModeOFF = document.getElementById("darkMode")
-        darkModeOFF.disabled = true
-        let lightModeOFF = document.getElementById("lightMode")
-        lightModeOFF.disabled = false
-        localStorage.setItem("LightDark", "light")
-    }
-}*/
+
+// Called when the server sends a new message over the WebSocket and renders that message so the user can read it
+function updateVote(message) {
+    const imageIDAndLikesObj = JSON.parse(message.data);
+    //console.log("Message received from server:")
+    //console.log(imageIDAndLikesObj)
+    const imageToLikeID = document.getElementById(imageIDAndLikesObj.imageid)
+    imageToLikeID.innerHTML = "Likes ♥: " + imageIDAndLikesObj.likes
+}

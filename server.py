@@ -19,7 +19,6 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         if path == "/websocket":  # establish a websocket connection after serving the home page
             WebSocketHandler.webSocketConnection(self)
 
-
 if __name__ == "__main__":
     host = "0.0.0.0"
     port = 8001

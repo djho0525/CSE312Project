@@ -4,6 +4,7 @@ import hashlib
 import login_signup, direct_messaging
 import util
 import database as db
+import WebSocketHandler
 
 activeUsers = []
 currentUser = []
@@ -83,8 +84,9 @@ def getResponse(server, path, received_data):
     elif path == "/websocket":
         socketKey = header["Sec-WebSocket-Key"] + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
         base64_string = base64.b64encode(hashlib.sha1(socketKey.encode()).digest()).decode()
-
-        response = "HTTP/1.1 101 Switching Protocols\r\nConnection:Upgrade\r\nUpgrade:websocket\r\nSec-WebSocket-Accept:" + base64_string + "\r\n\r\n  "
+        response = "HTTP/1.1 101 Switching Protocols\r\nConnection:Upgrade\r\nUpgrade:websocket\r\nSec-WebSocket-Accept:" + base64_string + "\r\n\r\n"
+        WebSocketHandler.webSocketClients.append(server)
+        print(WebSocketHandler.webSocketClients)
         return response.encode()
     else:
         return response404()
@@ -124,12 +126,15 @@ def postResponse(server, path, received_data):
         # print(storedUser + " has made a request for ")
         db.updateColor(storedUser, form["Mode"])
         return response301("/home")
-    elif path == "/upvote":
-        imageID = int(str(form["uploadID"]).strip("image"))
-        db.addLike(imageID)
-        return response301("/home")
+    #elif path == "/upvote":
+        #imageID = int(str(form["uploadID"]).strip("image"))
+        #db.addLike(imageID)
+        #return response301("/home")
     #elif path == "/logout":
         #activeUsers.pop(server)
         #return response301("/")
+    elif path == "/logout":
+        activeUsers.pop(server)
+        return response301("/")
     else:
         return response404()
