@@ -12,7 +12,6 @@ def webSocketConnection(server):
         if len(recData) > 0:
             frame = webSocketFrameParser(recData)
             if frame["opcode"] == 8:
-                r.storedUser = r.serverToUser[server]
                 print(r.storedUser + " has disconnected")
                 if r.storedUser in r.activeUsers:
                     r.activeUsers.remove(r.storedUser)

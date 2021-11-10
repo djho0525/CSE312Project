@@ -25,7 +25,12 @@ def getResponse(server, path, received_data):
     header, data = util.buffering(server, received_data)
     header = util.parseHeaders(header)
     storedUser = util.userFromCookies(header)
+
+    if storedUser in userToServer:
+        serverToUser.pop( userToServer.pop(storedUser) )
+        userToServer[storedUser], serverToUser[server] = server, storedUser
     print(storedUser + " requested the data above")
+
 
     if path == "/":
         content = util.readBytes("templates/login.html")
@@ -95,6 +100,12 @@ def postResponse(server, path, received_data):
     path, queries = util.querying(path)
     header, data = util.buffering(server, received_data)
     header = util.parseHeaders(header)
+    storedUser = util.userFromCookies(header)
+
+    if storedUser in userToServer:
+        serverToUser.pop( userToServer.pop(storedUser) )
+    userToServer[storedUser], serverToUser[server] = server, storedUser
+    print(storedUser + " requested the data above")
 
     try:
         form = util.parsing(data.decode())
@@ -102,8 +113,6 @@ def postResponse(server, path, received_data):
     except ValueError:
         print("SKIPPED PARSING")
 
-    storedUser = util.userFromCookies(header)
-    print(storedUser + " requested the data above")
 
     if path == "/login":
         return login_signup.login(server, email=form['email'], password=form['password'])
