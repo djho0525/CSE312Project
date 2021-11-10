@@ -24,6 +24,8 @@ def getResponse(server, path, received_data):
     path, queries = util.querying(path)
     header, data = util.buffering(server, received_data)
     header = util.parseHeaders(header)
+    storedUser = util.userFromCookies(header)
+    print(storedUser + " requested the data above")
 
     if path == "/":
         content = util.readBytes("templates/login.html")
@@ -50,7 +52,7 @@ def getResponse(server, path, received_data):
                 for x in activeUsers:
                     line = line + '<a class ="dropdown-item" href="/messages?user=' + x + '">' + x + '</a>'
             content = content + line
-        if db.getColor(currentUser[0]) == "light":
+        if db.getColor(storedUser) == "light":
             content = content.replace("{{colorMode}}",'lightMode.css')
             content = util.renderImages(content)
             return response200("text/html", len(content), content.encode())
@@ -100,6 +102,9 @@ def postResponse(server, path, received_data):
     except ValueError:
         print("SKIPPED PARSING")
 
+    storedUser = util.userFromCookies(header)
+    print(storedUser + " requested the data above")
+
     if path == "/login":
         return login_signup.login(server, email=form['email'], password=form['password'])
     elif path == '/signUp':
@@ -107,9 +112,8 @@ def postResponse(server, path, received_data):
     elif path == "/image-upload":
         return response301("/")
     elif path == "/mode":
-        print(form["Mode"])
-        print(currentUser[0])
-        db.updateColor(currentUser[0],form["Mode"])
+        # print(storedUser + " has made a request for ")
+        db.updateColor(storedUser, form["Mode"])
         return response301("/home")
     elif path == "/upvote":
         imageID = int(str(form["uploadID"]).strip("image"))

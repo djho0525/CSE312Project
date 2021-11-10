@@ -168,7 +168,7 @@ def renderImages(html):
         caption = image[2]
         likes = image[3]
         currentImageTag = contentPlaceholder.replace("{{image_filename}}", "/uploadedimage/" + imageName)  # when browser receives our images.html it will make request(s) for the image(s) thru a request url of /image/<image_name> "/image/" is the path we told the browser to request in the html
-        print(currentImageTag)
+        # print(currentImageTag)
         allImageTagsCaptionLikes += "<div class=" + "upload" + ">" + currentImageTag
         allImageTagsCaptionLikes += "<p class="+"image-caption"+">" + "Likes ♥: " + str(likes) + "</p>"
         #allImageTagsCaptionLikes += "<br>"
@@ -213,5 +213,9 @@ def querying(path):
 def escapeHTML(string):
     return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
-def userFromCookies(string):
-    return string.split("; ")[1].split("=")[1]
+def userFromCookies(header):
+    if "Cookie" in header and "user" in header["Cookie"]:
+        cookie = header["Cookie"]
+        cookie = cookie[cookie.index("user"):]
+        return cookie.split("; ")[0].split("=")[1]
+    else: return ''

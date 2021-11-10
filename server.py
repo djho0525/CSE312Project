@@ -16,7 +16,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
             s = r.userToServer.pop(r.storedUser)
             r.userToServer[r.storedUser] = s
             r.serverToUser[self] = r.storedUser
-            print(r.storedUser + " made a request:")
+            # print(r.storedUser + " made a request:")
 
         if request_type == "GET": response = r.getResponse(self, path, received_data)
         else: response = r.postResponse(self, path, received_data)
