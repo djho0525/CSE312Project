@@ -14,8 +14,8 @@ function sendMessage() {
     socket.send(JSON.stringify({'listener': "direct_message", 'message': message}));
 }
 
-function addMessage(message) {
-    console.log("or here?")
-    messages = $("#display_message").html() + message.data + "<br/>";
+function addMessage(content) {
+    message = JSON.parse(content.data)
+    messages = $("#display_message").html() + "<b>" + message['user'] + "</b>" + message['content'] + "<br/>";
     $("#display_message").html(messages);
 }

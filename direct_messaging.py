@@ -9,7 +9,7 @@ def getResponse(sender, receiver):
     if receiver in r.activeUsers:
         messages = ''
         for message in db.getMessages(sender, receiver):
-            messages += "<b>" + message['user'] + "</b>" + message['content'] + '<br/>'
+            messages += "<b>" + message['user'] + "</b>" + message['content'] + "<br/>"
         content = util.readBytes("templates/direct_messaging.html")
         content = content.decode().replace('{{messages}}', messages).replace('{{receiver}}', receiver).encode()
         active_chatrooms[sender] = receiver
