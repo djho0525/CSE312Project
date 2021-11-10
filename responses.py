@@ -6,7 +6,7 @@ import util
 import database as db
 import WebSocketHandler
 
-activeUsers = {}  # server mapped to email
+activeUsers = []
 currentUser = []
 storedUser, serverToUser, userToServer = None, {}, {}
 
@@ -48,7 +48,7 @@ def getResponse(server, path, received_data):
         idxFile = open('templates/index.html', 'rt').readlines()
         for line in idxFile:
             if line.find("<!--ActiveUsers-->") != -1:
-                for x in activeUsers.values():
+                for x in activeUsers:
                     line = line + '<a class ="dropdown-item" href="/messages?user=' + x + '">' + x + '</a>'
             content = content + line
         if db.getColor(currentUser[0]) == "light":
@@ -114,9 +114,12 @@ def postResponse(server, path, received_data):
         db.updateColor(currentUser[0],form["Mode"])
         return response301("/home")
     #elif path == "/upvote":
-     #   imageID = int(str(form["uploadID"]).strip("image"))
-     #   db.addLike(imageID)
-     #   return response301("/home")
+        #imageID = int(str(form["uploadID"]).strip("image"))
+        #db.addLike(imageID)
+        #return response301("/home")
+    #elif path == "/logout":
+        #activeUsers.pop(server)
+        #return response301("/")
     elif path == "/logout":
         activeUsers.pop(server)
         return response301("/")

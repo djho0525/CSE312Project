@@ -7,20 +7,19 @@ webSocketClients = []
 
 def webSocketConnection(server):
     print(r.storedUser + " has connected")
+    if r.storedUser not in r.activeUsers:
+        r.activeUsers.append(r.storedUser)
     r.storedUser = ''
     while True:
         recData = server.request.recv(2048)
         if len(recData) > 0:
             frame = webSocketFrameParser(recData)
             if frame["opcode"] == 8:
-                print(r.activeUsers)
-                if server in r.activeUsers: print("removing " + r.activeUsers[server] + " from active users list")
-                # email = r.activeUsers.pop(server)
-                if server not in r.activeUsers: print("user successfully removed")
-                print(r.activeUsers)
-                # r.storeUser = email
                 r.storedUser = r.serverToUser[server]
                 print(r.storedUser + " has disconnected")
+                if r.storedUser in r.activeUsers:
+                    r.activeUsers.remove(r.storedUser)
+                    print("removed " + r.storedUser + " from active users list")
 
             elif frame["opcode"] == 1:
                 content = json.loads(bytes(frame["data"]).decode())
