@@ -138,6 +138,7 @@ def getColor(email):
     cur.execute("SELECT mode FROM colormode WHERE email=(%s)",(email,))
     color = cur.fetchone()
     if color is not None:
+        print("getting color for: "+email)
         return color[0]
     else:
         return 0

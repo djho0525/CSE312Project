@@ -17,9 +17,11 @@ def webSocketConnection(server):
             if frame["opcode"] == 8:
                 r.storedUser = r.serverToUser[server]
                 print(r.storedUser + " has disconnected")
+                webSocketClients.remove(server)
                 if r.storedUser in r.activeUsers:
                     r.activeUsers.remove(r.storedUser)
                     print("removed " + r.storedUser + " from active users list")
+                break
 
             elif frame["opcode"] == 1:
                 content = json.loads(bytes(frame["data"]).decode())
