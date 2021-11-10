@@ -45,7 +45,7 @@ def getResponse(server, path, received_data):
         content = util.readBytes("static/jessehartloff.jpeg")
         return response200("image/jpeg", len(content), content)
     elif path == "/messages" and "user" in queries:
-        return direct_messaging.getResponse(serverToUser[server], queries['user'])
+        return direct_messaging.getResponse(storedUser, queries['user'])
     elif path == "/direct_messaging.js":
         content = util.readBytes("static/direct_messaging.js")
         return response200("text/javascript", len(content), content)
