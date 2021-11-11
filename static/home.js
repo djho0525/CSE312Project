@@ -25,9 +25,21 @@ function sendMessage(imageToLikeID) {
 
 // Called when the server sends a new message over the WebSocket and renders that message so the user can read it
 function updateVote(message) {
-    const imageIDAndLikesObj = JSON.parse(message.data);
-    //console.log("Message received from server:")
-    //console.log(imageIDAndLikesObj)
-    const imageToLikeID = document.getElementById(imageIDAndLikesObj.imageid)
-    imageToLikeID.innerHTML = "Likes ♥: " + imageIDAndLikesObj.likes
+    content = JSON.parse(message.data);
+    if(content.hasOwnProperty('listener') && content['listener'] == 'direct_message') {
+        setNotif(content);
+    }
+    else {
+        const imageIDAndLikesObj = JSON.parse(message.data);
+        //console.log("Message received from server:")
+        //console.log(imageIDAndLikesObj)
+        const imageToLikeID = document.getElementById(imageIDAndLikesObj.imageid)
+        imageToLikeID.innerHTML = "Likes ♥: " + imageIDAndLikesObj.likes
+    }
+}
+
+function setNotif(content) {
+    $('.toast-header strong').text(content['sender'] + ' says...');
+    $('.toast-body').html(content['message'] + '<br><br><a href="/messages?user=' + content['sender'] + '" class="btn btn-warning">Reply</a>')
+    $('.toast').toast('show');
 }

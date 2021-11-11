@@ -19,11 +19,29 @@
             </a>
             <div class="text-right">
                 <div class="container">
-                    <button type="button" class="btn btn-primary" onclick="">Logout</button>
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            Active Users
+                        </button>
+                        <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                            <!--ActiveUsers-->
+                        </div>
+                    </div>
+<!--                    <button type="button" class="btn btn-primary" onclick="">Logout</button>-->
                 </div>
             </div>
         </div>
     </nav>
+
+    <div class="toast bg-primary" style="position: absolute; right: 10px;" data-animation="true" data-delay="4000">
+        <div class="toast-header">
+            <strong class="mr-auto text-primary"></strong>
+            <button type="button" class="ml-2 mb-1 close" data-dismiss="toast">&times;</button>
+        </div>
+        <div class="toast-body">
+
+        </div>
+    </div>
 
     <div class="container">
         <div class="card">
@@ -34,7 +52,8 @@
                 {{messages}}
             </div>
             <div class="card-footer">
-                <input id="input_message" type="text" name="message" placeholder="Reply here ......"><br/>
+                <input id="input_message" type="text" name="message" placeholder="Reply here ......">
+                <br><br>
                 <input type="submit" value="Submit" onclick="sendMessage()">
             </div>
         </div>

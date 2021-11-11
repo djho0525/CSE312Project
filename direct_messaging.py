@@ -7,6 +7,8 @@ active_chatrooms = {}           # only sender to receiver
 def getResponse(sender, receiver):
     receiver = receiver.replace("%40", "@")
     if receiver in r.activeUsers:
+        active_chatrooms[sender] = receiver
+
         messages = ''
         for message in db.getMessages(sender, receiver):
             messages += "<b>" + message['user'] + ": </b>" + message['content'] + "<br/>"

@@ -1,6 +1,5 @@
 const socket = new WebSocket("ws://" + window.location.host + "/websocket");
-console.log(socket);
-socket.onmessage = addMessage;
+socket.onmessage = webSocketListener;
 
 document.addEventListener("keypress", function (event) {
     if (event.code === "Enter") {
@@ -14,8 +13,19 @@ function sendMessage() {
     socket.send(JSON.stringify({'listener': "direct_message", 'message': message}));
 }
 
-function addMessage(content) {
-    message = JSON.parse(content.data)
-    messages = $("#display_message").html() + "<b>" + message['user'] + "</b>" + message['content'] + "<br/>";
-    $("#display_message").html(messages);
+function webSocketListener(data) {
+    var content = JSON.parse(data.data)
+    var listener = content['listener']
+
+    if (listener == 'direct_message') {
+        if (content['type'] == 'chatroom') {
+            var messages = $("#display_message").html() + "<b>" + content['sender'] + ": </b>" + content['message'] + "<br/>";
+            $("#display_message").html(messages);
+        }
+        else if (content['type'] == 'notif') {
+            $('.toast-header strong').text(content['sender'] + ' says...');
+            $('.toast-body').html(content['message'] + '<br><br><a href="/messages?user=' + content['sender'] + '" class="btn btn-warning">Reply</a>')
+            $('.toast').toast('show');
+        }
+    }
 }

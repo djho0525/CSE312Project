@@ -1,7 +1,7 @@
 import database
 import responses as r
 import json
-import direct_messaging
+import direct_messaging as DM
 
 webSocketClients = {}
 
@@ -42,12 +42,14 @@ def webSocketConnection(server, userFromCookie):
                         client.request.sendall(frameToSend)
                 if "listener" in content.keys():
                     if content["listener"] == "direct_message":
-                        sender, receiver = direct_messaging.newMessage(userFromCookie, content["message"])
-                        clients = [r.userToServer[sender], r.userToServer[receiver]]
-                        sendFrame = createWebSocketFrame(json.dumps({"message": content["message"], "sender": sender}))
-                        for client in clients:
-                            print(clients)
-                            client.request.sendall(sendFrame)
+                        sender, receiver = DM.newMessage(userFromCookie, content["message"])
+
+                        chatroom_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "chatroom", "message": content["message"], "sender": sender}))
+                        notif_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "notif", "message": content["message"], "sender": sender}))
+                        webSocketClients[sender].request.sendall(chatroom_frame)
+
+                        if receiver in DM.active_chatrooms and DM.active_chatrooms[receiver] == sender: webSocketClients[receiver].request.sendall(chatroom_frame)
+                        else: webSocketClients[receiver].request.sendall(notif_frame)
 
 
 
