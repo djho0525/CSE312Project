@@ -42,13 +42,15 @@ def getResponse(server, path, received_data):
         content = util.readBytes("static/jessehartloff.jpeg")
         return response200("image/jpeg", len(content), content)
     elif path == "/messages" and "user" in queries:
-        return direct_messaging.getResponse(userFromCookie, queries['user'])
+        if userFromCookie not in activeUsers: activeUsers.append(userFromCookie)
+        return DM.getResponse(userFromCookie, queries['user'])
     elif path == "/direct_messaging.js":
         content = util.readBytes("static/direct_messaging.js")
         return response200("text/javascript", len(content), content)
     elif path == "/home":
         content = ""
         idxFile = open('templates/index.html', 'rt').readlines()
+        if userFromCookie not in activeUsers: activeUsers.append(userFromCookie)
         for line in idxFile:
             if line.find("<!--ActiveUsers-->") != -1:
                 for x in activeUsers:
