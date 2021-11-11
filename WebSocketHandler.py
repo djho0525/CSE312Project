@@ -3,11 +3,9 @@ import responses as r
 import json
 import direct_messaging
 
-webSocketClients = []
+webSocketClients = {}
 
 def webSocketConnection(server, userFromCookie):
-    r.serverToUser.pop( r.userToServer.pop(userFromCookie) )
-    r.userToServer[userFromCookie], r.serverToUser[server] = server, userFromCookie
     print(userFromCookie + " has connected")
 
     if userFromCookie not in r.activeUsers:
@@ -19,7 +17,7 @@ def webSocketConnection(server, userFromCookie):
             frame = webSocketFrameParser(recData)
             if frame["opcode"] == 8:
                 print(userFromCookie + " has disconnected")
-                webSocketClients.remove(server)
+                webSocketClients.pop(userFromCookie)
                 if userFromCookie in r.activeUsers:
                     r.activeUsers.remove(userFromCookie)
                     print("removed " + userFromCookie + " from active users list")
@@ -39,7 +37,7 @@ def webSocketConnection(server, userFromCookie):
                     #print(jsonFormattedNewUpvote)
                     frameToSend = createWebSocketFrame(jsonFormattedNewUpvote)
                     #print(frameToSend)
-                    for client in webSocketClients:
+                    for client in webSocketClients.values():
                         #print("Websocket Client: " + str(client))
                         client.request.sendall(frameToSend)
                 if "listener" in content.keys():

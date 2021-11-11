@@ -1,7 +1,7 @@
 import database as db
 import responses as r
 
-def login(server, email, password):
+def login(email, password):
     email = email.replace("%40", "@")
     if db.userExists(email):
         user = db.getUser(email)
@@ -9,9 +9,6 @@ def login(server, email, password):
             db.loginUser(email)
             r.currentUser.clear()
             r.currentUser.append(email)
-
-            r.serverToUser[server] = email
-            r.userToServer[email] = server
             r.activeUsers.append(email)
 
             return r.response301("/home", "user=" + email)
@@ -22,7 +19,7 @@ def login(server, email, password):
     return r.response301("/")
 
 
-def signup(server, name, email, password, confirm_password):
+def signup(name, email, password, confirm_password):
     email = email.replace("%40", "@")
     if db.userExists(email): print('Email was already registered')
     else:
@@ -34,9 +31,6 @@ def signup(server, name, email, password, confirm_password):
             r.currentUser.clear()
             r.currentUser.append(email)
             print('Created account successfully')
-
-            r.serverToUser[server] = email
-            r.userToServer[email] = server
             r.activeUsers.append(email)
 
             return r.response301("/home", "user=" + email)

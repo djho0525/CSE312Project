@@ -1,14 +1,14 @@
 import base64
 import hashlib
 
-import login_signup, direct_messaging
+import login_signup
+import direct_messaging as DM
 import util
 import database as db
 import WebSocketHandler
 
 activeUsers = []
 currentUser = []
-serverToUser, userToServer = {}, {}
 
 def response200(con_type, length, content):  # input content has to be encoded
     return b"HTTP/1.1 200 OK\r\nContent-Type:" + con_type.encode() + b"\r\nX-Content-Type-Options: nosniff\r\nContent-Length: " + str(length).encode() + b"\r\n\r\n" + content + b"\r\n"
@@ -26,10 +26,6 @@ def getResponse(server, path, received_data):
     header, data = util.buffering(server, received_data)
     header = util.parseHeaders(header)
     userFromCookie = util.userFromCookies(header)
-
-    if userFromCookie in userToServer:
-        serverToUser.pop( userToServer.pop(userFromCookie) )
-    userToServer[userFromCookie], serverToUser[server] = server, userFromCookie
     print(userFromCookie + " requested the data above")
 
 
@@ -85,7 +81,7 @@ def getResponse(server, path, received_data):
         socketKey = header["Sec-WebSocket-Key"] + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
         base64_string = base64.b64encode(hashlib.sha1(socketKey.encode()).digest()).decode()
         response = "HTTP/1.1 101 Switching Protocols\r\nConnection:Upgrade\r\nUpgrade:websocket\r\nSec-WebSocket-Accept:" + base64_string + "\r\n\r\n"
-        WebSocketHandler.webSocketClients.append(server)
+        WebSocketHandler.webSocketClients[userFromCookie] = server
         print(WebSocketHandler.webSocketClients)
         return response.encode()
     else:
@@ -103,10 +99,6 @@ def postResponse(server, path, received_data):
     header, data = util.buffering(server, received_data)
     header = util.parseHeaders(header)
     userFromCookie = util.userFromCookies(header)
-
-    if userFromCookie in userToServer:
-        serverToUser.pop( userToServer.pop(userFromCookie) )
-    userToServer[userFromCookie], serverToUser[server] = server, userFromCookie
     print(userFromCookie + " requested the data above")
 
     try:
@@ -117,9 +109,9 @@ def postResponse(server, path, received_data):
 
 
     if path == "/login":
-        return login_signup.login(server, email=form['email'], password=form['password'])
+        return login_signup.login(email=form['email'], password=form['password'])
     elif path == '/signUp':
-        return login_signup.signup(server, name=form['name'], email=form['email'], password=form['password'], confirm_password=form['confirm_password'])
+        return login_signup.signup(name=form['name'], email=form['email'], password=form['password'], confirm_password=form['confirm_password'])
     elif path == "/image-upload":
         return response301("/")
     elif path == "/mode":
