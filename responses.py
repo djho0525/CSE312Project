@@ -84,8 +84,15 @@ def getResponse(server, path, received_data):
         socketKey = header["Sec-WebSocket-Key"] + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
         base64_string = base64.b64encode(hashlib.sha1(socketKey.encode()).digest()).decode()
         response = "HTTP/1.1 101 Switching Protocols\r\nConnection:Upgrade\r\nUpgrade:websocket\r\nSec-WebSocket-Accept:" + base64_string + "\r\n\r\n"
-        WebSocketHandler.webSocketClients[userFromCookie] = server
-        print(WebSocketHandler.webSocketClients)
+        #WebSocketHandler.webSocketClients[userFromCookie] = server
+        #WebSocketHandler.webSocketClientsList.append(server)
+        if userFromCookie not in WebSocketHandler.webSocketClientsDictList.keys():
+            WebSocketHandler.webSocketClientsDictList[userFromCookie] = []
+            WebSocketHandler.webSocketClientsDictList[userFromCookie].append(server)
+        else:
+            WebSocketHandler.webSocketClientsDictList[userFromCookie].append(server)
+        #print(WebSocketHandler.webSocketClients)
+        print(WebSocketHandler.webSocketClientsDictList)
         return response.encode()
     else:
         return response404()

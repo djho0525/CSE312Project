@@ -124,3 +124,30 @@ input[type=text], select {
   border-radius: 4px;
   box-sizing: border-box;
 }
+
+.card {
+    background-color: gold;
+    color: black;
+    margin-top: 10%;
+}
+
+.bg-primary{
+    background-color: #3D3D3D!important;
+}
+
+.toast{
+    background-color: #3D3D3D;
+}
+
+.toast-header{
+    background-color: gold;
+    color: black;
+}
+
+.text-primary {
+    color: black!important;
+}
+
+.toast-body{
+    color: gold;
+}

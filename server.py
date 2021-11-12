@@ -9,8 +9,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         received_data = self.request.recv(1024)
         client_id = self.client_address[0] + ":" + str(self.client_address[1])
 
-        request_line = received_data.strip().decode().split('\r\n')[0].split(' ')  # ie. ["GET", "/", "HTTP/1.1"]
-        request_type, path = request_line[0], request_line[1]
+        request_line = received_data.strip().split('\r\n'.encode())[0].split(' '.encode())  # ie. ["GET", "/", "HTTP/1.1"]
+        request_type, path = request_line[0].decode(), request_line[1].decode()
 
         if request_type == "GET": response = r.getResponse(self, path, received_data)
         else: response = r.postResponse(self, path, received_data)

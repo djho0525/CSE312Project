@@ -3,7 +3,9 @@ import responses as r
 import json
 import direct_messaging as DM
 
-webSocketClients = {}
+#webSocketClients = {}
+#webSocketClientsList = []
+webSocketClientsDictList = {}
 
 def webSocketConnection(server, userFromCookie):
     print(userFromCookie + " has connected")
@@ -17,8 +19,11 @@ def webSocketConnection(server, userFromCookie):
             frame = webSocketFrameParser(recData)
             if frame["opcode"] == 8:
                 print(userFromCookie + " has disconnected")
-                webSocketClients.pop(userFromCookie)
-                if userFromCookie in r.activeUsers:
+                #webSocketClients.pop(userFromCookie)
+                #webSocketClientsList.remove(server)
+                webSocketClientsDictList[userFromCookie].remove(server)
+                print(webSocketClientsDictList)
+                if userFromCookie in r.activeUsers and len(webSocketClientsDictList[userFromCookie]) == 0: # if all of that user's open websocket connections are closed
                     r.activeUsers.remove(userFromCookie)
                     print("removed " + userFromCookie + " from active users list")
                 break
@@ -28,28 +33,35 @@ def webSocketConnection(server, userFromCookie):
                 if "imageid" in content.keys():
                     #print(b"TESTING LIVE UPVOTES" + frame["data"])
                     imageid = str(content["imageid"]).replace("image","")
-                    #print("Image ID to upvote: " + imageid)
-                    #print("Number of Likes: " + content["likes"])
+                    print("Image ID to upvote: " + imageid)
+                    print("Number of Likes: " + content["likes"])
                     newNumLikes = int(content["likes"]) + 1
                     database.addLikeLive(imageid,newNumLikes)
                     tempUpvoteDict = {"imageid":str(content["imageid"]),"likes":str(newNumLikes)}
                     jsonFormattedNewUpvote = json.dumps(tempUpvoteDict)
-                    #print(jsonFormattedNewUpvote)
+                    print(jsonFormattedNewUpvote)
                     frameToSend = createWebSocketFrame(jsonFormattedNewUpvote)
                     #print(frameToSend)
-                    for client in webSocketClients.values():
-                        #print("Websocket Client: " + str(client))
-                        client.request.sendall(frameToSend)
+                    for user in webSocketClientsDictList.keys():
+                        for client in webSocketClientsDictList[user]:
+                            #print("Websocket Client: " + str(client))
+                            client.request.sendall(frameToSend)
                 if "listener" in content.keys():
                     if content["listener"] == "direct_message":
                         sender, receiver = DM.newMessage(userFromCookie, content["message"])
 
                         chatroom_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "chatroom", "message": content["message"], "sender": sender}))
                         notif_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "notif", "message": content["message"], "sender": sender}))
-                        webSocketClients[sender].request.sendall(chatroom_frame)
+                        #webSocketClients[sender].request.sendall(chatroom_frame)
+                        for client in webSocketClientsDictList[sender]:
+                            client.request.sendall(chatroom_frame)
 
-                        if receiver in DM.active_chatrooms and DM.active_chatrooms[receiver] == sender: webSocketClients[receiver].request.sendall(chatroom_frame)
-                        else: webSocketClients[receiver].request.sendall(notif_frame)
+                        if receiver in DM.active_chatrooms and DM.active_chatrooms[receiver] == sender:
+                            for client in webSocketClientsDictList[receiver]:
+                                client.request.sendall(chatroom_frame)
+                        else:
+                            for client in webSocketClientsDictList[receiver]:
+                                client.request.sendall(notif_frame)
 
 
 
