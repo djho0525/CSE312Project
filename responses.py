@@ -56,7 +56,7 @@ def getResponse(server, path, received_data):
                 for x in activeUsers:
                     line = line + '<a class ="dropdown-item" href="/messages?user=' + x + '">' + x + '</a>'
             content = content + line
-        content = content.replace("{{user}}", userFromCookie)
+        content = content.replace("{{user}}", db.getUser(userFromCookie).name.replace("+"," "))
         if db.getColor(userFromCookie) == "light":
             content = content.replace("{{colorMode}}",'lightMode.css')
             content = util.renderImages(content)
