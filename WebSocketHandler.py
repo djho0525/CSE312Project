@@ -57,8 +57,9 @@ def webSocketConnection(server, userFromCookie):
                             client.request.sendall(chatroom_frame)
 
                         if receiver in DM.active_chatrooms and DM.active_chatrooms[receiver] == sender:
-                            for client in webSocketClientsDictList[receiver]:
-                                client.request.sendall(chatroom_frame)
+                            if receiver != sender: # Prevents the message for sending multiple times when the sender is also the receiver
+                                for client in webSocketClientsDictList[receiver]:
+                                    client.request.sendall(chatroom_frame)
                         else:
                             for client in webSocketClientsDictList[receiver]:
                                 client.request.sendall(notif_frame)
