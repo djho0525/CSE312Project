@@ -23,7 +23,7 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
 if __name__ == "__main__":
     host = "0.0.0.0"
-    port = 8001
+    port = 8000
 
     print('Running on ' + str(port))
     server = socketserver.ThreadingTCPServer((host, port), MyTCPHandler)

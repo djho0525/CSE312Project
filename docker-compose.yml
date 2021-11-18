@@ -6,10 +6,12 @@ services:
       MYSQL_ROOT_PASSWORD: 'change me'
       MYSQL_DATABASE: 'cse312_project'
       MYSQL_USER: 'sqluser'
-      MYSQL_PASSWORD: 'change me'
+      MYSQL_PASSWORD: 'sqluserpassword'
   app:
     build: .
     environment:
       WAIT_HOSTS: mysql:3306
       DB_USERNAME: 'sqluser'
-      DB_PASSWORD: 'change me'
+      DB_PASSWORD: 'sqluserpassword'
+    ports:
+      - '8080:8000'
