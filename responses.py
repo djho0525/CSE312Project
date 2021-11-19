@@ -54,7 +54,8 @@ def getResponse(server, path, received_data):
         for line in idxFile:
             if line.find("<!--ActiveUsers-->") != -1:
                 for x in activeUsers:
-                    line = line + '<a class ="dropdown-item" href="/messages?user=' + x + '">' + x + '</a>'
+                    if x != userFromCookie:
+                        line = line + '<a class ="dropdown-item" href="/messages?user=' + x + '">' + x + '</a>'
             content = content + line
         content = content.replace("{{user}}", db.getUser(userFromCookie).name.replace("+"," "))
         if db.getColor(userFromCookie) == "light":

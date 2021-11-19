@@ -2,18 +2,22 @@ import mysql.connector as mysql
 import os
 from User import User
 
+#host = 'localhost' #Change host to "localhost" for local testing, "mysql" for docker
+host = 'mysql'
 u = 'sqluser'   # os.environ['DB_USERNAME']
 p = 'sqluserpassword'   # os.environ['DB_PASSWORD']
 database = 'cse312_project'
 
-db = mysql.connect(user=u, password=p)
+db = mysql.connect(host=host, user=u, password=p, database=database)
 cur = db.cursor(prepared=True)
-# INITIALIZE DATABASE AND TABLES
-cur.execute("CREATE DATABASE IF NOT EXISTS " + database)
-db.database = database
-cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
-cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
-cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
+
+def initDB():
+    # INITIALIZE DATABASE AND TABLES
+    cur.execute("CREATE DATABASE IF NOT EXISTS " + database)
+    db.database = database
+    cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
+    cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
 
 users = {}      # {email: User object}
 
@@ -144,10 +148,12 @@ def getColor(email):
         return 0
 
 if __name__ == '__main__':
+    initDB()
+
     # dropUserTable()
     # addUser('email@gmail.com', 'password', 'test')
     # removeUser('email@gmail.com')
-    setupUploadsTable()
+    #setupUploadsTable()
     #uploadImage("/imageuploads/image1.jpg","hi")
     #print(getImageByID(1)[0]#[1])
     #getAllImagePaths()
@@ -156,11 +162,11 @@ if __name__ == '__main__':
     #getLikesByID(1)
     #addLike(1)
     #resetColorModeTable()
-    setupColorMode()
+    #setupColorMode()
     #print(getColor("da@gmail.com"))
     #updateColor("da@gmail.com","dark")
     #cur.execute("SELECT * FROM users")
     #for x in cur.fetchall(): print(x)
     #print(users)
     # print(getLatest10Uploads())
-    db.close()
+    #db.close()
