@@ -1,11 +1,12 @@
 import database as db
 import responses as r
+import bcrypt
 
 def login(email, password):
     email = email.replace("%40", "@")
     if db.userExists(email):
         user = db.getUser(email)
-        if user.password == password:
+        if bcrypt.checkpw(password.encode(), user.password.encode()):
             db.loginUser(email)
             r.currentUser.clear()
             r.currentUser.append(email)

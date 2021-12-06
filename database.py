@@ -1,6 +1,7 @@
 import mysql.connector as mysql
 import os
 from User import User
+import bcrypt
 
 #host = 'localhost' #Change host to "localhost" for local testing, "mysql" for docker
 host = 'mysql'
@@ -21,10 +22,14 @@ def initDB():
 
 users = {}      # {email: User object}
 
+def hashPassword(password):
+    return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
+
 def dropUserTable():
     cur.execute("DROP TABLE users")
 
 def addUser(email, password, name):
+    password = hashPassword(password)
     cur.execute("INSERT INTO users (email, password, name) VALUES (%s, %s, %s)", (email, password, name))
     db.commit()
 
