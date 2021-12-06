@@ -3,7 +3,7 @@ import os
 from User import User
 
 #host = 'localhost' #Change host to "localhost" for local testing, "mysql" for docker
-host = 'mysql'
+host = 'localhost'
 u = 'sqluser'   # os.environ['DB_USERNAME']
 p = 'sqluserpassword'   # os.environ['DB_PASSWORD']
 database = 'cse312_project'
@@ -33,9 +33,12 @@ def removeUser(email):
     db.commit()
 
 def userExists(email):
-    cur.execute("SELECT email FROM users")
-    emails = list(i[0] for i in cur.fetchall())
-    return email in emails
+    cur.execute("SELECT * FROM users WHERE email=%s",(email,))
+    row = cur.fetchone()
+    if row is not None:
+        return True
+    else:
+        return False
 
 def getUser(email):
     cur.execute("SELECT * FROM users WHERE email=%s", (email,))
@@ -71,41 +74,16 @@ def uploadImage(imagePath,caption):
     cur.execute("INSERT INTO uploads (imagepath,caption) VALUES (%s,%s)", (imagePath,caption))
     db.commit()
 
-def getAllImages():
-    #Can limit the amount of images retrived
-    #cur.execute("SELECT * FROM uploads LIMIT 10")
-    cur.execute("SELECT * FROM uploads")
-    images = cur.fetchall
-    return images
-
-def getAllImagePaths():
-    #Can limit the amount of imagesPaths retrived
-    #cur.execute("SELECT imagepath FROM uploads LIMIT 10")
-    cur.execute("SELECT imagepath FROM uploads")
-    imagesPaths = cur.fetchall
-    return imagesPaths
-
-def getImageByID(uploadID):
-    cur.execute("SELECT imagepath,caption FROM uploads WHERE uploadID = (%s)", (uploadID,))
-    image = cur.fetchone()
-    return image
-
-def getLikesByID(uploadID):
-    cur.execute("SELECT likes FROM uploads WHERE uploadID = (%s)", (uploadID,))
-    likes = cur.fetchone()
-    print(likes[0])
-    return int(likes[0])
-
 def getLastIDNum():
     cur.execute("SELECT max(uploadID) FROM uploads")
     id = cur.fetchone()
     if id[0] is not None:
         return id[0]
     else:
-        return 0
+        return False
 
 def getLatest10Uploads():
-    cur.execute("SELECT * FROM cse312_project.uploads ORDER BY uploadID desc LIMIT 10")
+    cur.execute("SELECT * FROM uploads ORDER BY uploadID desc LIMIT 10")
     latestUploads = cur.fetchall()
     return latestUploads
 
