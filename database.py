@@ -19,6 +19,7 @@ def initDB():
     cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
     cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
     cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
+    cur.execute("CREATE TABLE IF NOT EXISTS register(email VARCHAR(256) UNIQUE NOT NULL ,name TEXT NOT NULL,token TEXT)")
 
 users = {}      # {email: User object}
 
@@ -129,6 +130,36 @@ def getColor(email):
         return color[0]
     else:
         return 0
+
+def addUserToRegister(email,name):
+    cur.execute("INSERT INTO register(email,name) VALUES(%s,%s)",(email,name,))
+    db.commit()
+
+def addTokenToUser(email,token):
+    cur.execute("UPDATE register SET token=%s WHERE email=%s",(token,email,))
+    db.commit()
+
+def getNameFromToken(token):
+    cur.execute("SELECT name,token FROM register")
+    data = cur.fetchall()
+    for row in data:
+        if row[1] != None:
+            if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
+                return row[0]
+        else:
+            return False
+
+def checkToken(token):
+    cur.execute("SELECT email,token FROM register")
+    data = cur.fetchall()
+    print(data)
+    for row in data:
+        if row[1] != None:
+            if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
+                return row[0]
+        else:
+            return False
+    return False
 
 if __name__ == '__main__':
     initDB()
