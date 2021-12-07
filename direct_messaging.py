@@ -6,7 +6,7 @@ active_chatrooms = {}           # only sender to receiver
 
 def getResponse(sender, receiver):
     receiver = receiver.replace("%40", "@")
-    if receiver in r.activeUsers:
+    if receiver in r.activeUsers and sender != receiver:
         active_chatrooms[sender] = receiver
 
         messages = ''

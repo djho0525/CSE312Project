@@ -9,25 +9,34 @@ def writeBytes(filename, data):
     with open(filename, "wb") as file: file.write(data)
     file.close()
 
-def buffering(server, received_data):
-    data = received_data
-    while b'\r\n\r\n' not in data:
-        data += server.request.recv(1024)
-    data = received_data.split(b"\r\n\r\n", 1)
-    header, body = data[0].strip().decode(), data[1]
-    header = header.split('\r\n')
-    if "Content-Length" in header[3]:
-        content_len = int(header[3].split(' ')[1])        # Content-Length: num
-        while content_len-len(body) > 0:
-            body += server.request.recv(1024)
-    return header[1:], body.strip()
+def parsingToDict(con_array, split_char):
+    result = {}
+    for x in con_array:
+        if split_char in x:
+            key, val = x.split(split_char, 1)
+            result[key] = val
+        else: return con_array
+    return result
 
-def parsing(data):
-    form = dict()
-    for f_input in data.split('&'):
-        name, value = f_input.split('=')
-        form[name] = value
-    return form
+def buffering(server, received_data):
+    while b'\r\n\r\n' not in received_data:
+        received_data += server.request.recv(1024)
+    data = received_data.split(b"\r\n\r\n", 1)
+    header, body = data[0].strip().decode().split('\r\n'), data[1]
+
+    content_len = int(header["Content-Length"]) if "Content-Length" in header else 0
+    content_type = header["Content-Type"] if "Content-Type" in header else ''
+    while content_len-len(body) > 0:
+        body += server.request.recv(1024)
+    body = parseBody(body, content_type)
+    return header[1:], body
+
+# def parsing(data):
+#     form = dict()
+#     for f_input in data.split('&'):
+#         name, value = f_input.split('=')
+#         form[name] = value
+#     return form
 
 # Parses HTTP Headers into a Dictionary
 def parseHeaders(headers):
@@ -62,6 +71,23 @@ def parseHeaders(headers):
             headersDict[key] = value
     # print(headersDict)
     return headersDict
+
+def parseBody(body, content_type):
+    content = {}
+    print(body)
+    if body == b'': return {}
+    if 'multipart/form-data' in content_type:
+        boundary = ('--' + content_type.split("; ")[1].split("=")[1]).encode()
+        body_list = list(filter(lambda x: x != b'\r\n' and x != b'' and x != b'--', body.strip().split(boundary)))
+        for y in body_list:
+            header, body = y.strip().split(b"\r\n\r\n", 1)
+            header = header.decode().replace("\r\n", "; ").replace(": ", "=")
+            temp = parsingToDict(header.split('; '), '=')
+            name = temp.pop('name')[1:-1]            # remove quotations "" around name value
+            content[name] = body
+            for key, val in temp.items(): content[key] = val
+    else: content = parsingToDict(body.decode().split('&'), '=')
+    return content
 
 imageUploads = []
 validFiles = []

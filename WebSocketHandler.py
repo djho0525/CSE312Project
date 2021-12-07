@@ -52,14 +52,13 @@ def webSocketConnection(server, userFromCookie):
 
                         chatroom_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "chatroom", "message": content["message"], "sender": sender}))
                         notif_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "notif", "message": content["message"], "sender": sender}))
-                        #webSocketClients[sender].request.sendall(chatroom_frame)
+                        # webSocketClients[sender].request.sendall(chatroom_frame)
                         for client in webSocketClientsDictList[sender]:
                             client.request.sendall(chatroom_frame)
 
                         if receiver in DM.active_chatrooms and DM.active_chatrooms[receiver] == sender:
-                            if receiver != sender: # Prevents the message for sending multiple times when the sender is also the receiver
-                                for client in webSocketClientsDictList[receiver]:
-                                    client.request.sendall(chatroom_frame)
+                            for client in webSocketClientsDictList[receiver]:
+                                client.request.sendall(chatroom_frame)
                         else:
                             for client in webSocketClientsDictList[receiver]:
                                 client.request.sendall(notif_frame)
