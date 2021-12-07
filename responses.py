@@ -52,6 +52,8 @@ def getResponse(server, path, received_data):
         content = util.readBytes("static/direct_messaging.js")
         return response200("text/javascript", len(content), content)
     elif path == "/home":
+        if token == "":
+            return response301("/")
         content = ""
         idxFile = open('templates/index.html', 'rt').readlines()
         if userFromCookie not in activeUsers: activeUsers.append(userFromCookie)

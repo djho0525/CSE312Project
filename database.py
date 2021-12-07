@@ -91,7 +91,7 @@ def getEmailFromToken(token):
 
 def getNameFromToken(token):
     user = getUserByToken(token)
-    return user.email if user else ''
+    return user.name if user else ''
 
 def setupUploadsTable():
     cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
@@ -175,6 +175,8 @@ def checkToken(token):
 
 if __name__ == '__main__':
     initDB()
+    print(getEmailFromToken("wRJSV3tFylpqgEIKjKZDPuzOi7GdbpeYoTJdA5UwuG4"))
+    # dropUserTable()
     # dropAllTables()
     # print(getEmailFromToken("wRJSV3tFylpqgEIKjKZDPuzOi7GdbpeYoTJdA5UwuG4"))
     #setupUploadsTable()
