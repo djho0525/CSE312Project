@@ -32,6 +32,9 @@ def signup(name, email, password, confirm_password):
             # r.activeUsers[server] = email
             db.addUser(email, password, name)
             db.addUserToRegister(email,name)
+            userToken = secrets.token_urlsafe(32)
+            userTokenHashed = bcrypt.hashpw(userToken.encode(), bcrypt.gensalt())
+            db.addTokenToUser(email, userTokenHashed)
             db.loginUser(email)
             db.insertDefaultColor(email)
             r.currentUser.clear()

@@ -139,6 +139,19 @@ def addTokenToUser(email,token):
     cur.execute("UPDATE register SET token=%s WHERE email=%s",(token,email,))
     db.commit()
 
+def getEmailFromToken(token):
+    cur.execute("SELECT email,token FROM register")
+    data = cur.fetchall()
+    if len(data) != 0:
+        for row in data:
+            if row[1] != None:
+                if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
+                    return row[0]
+            else:
+                return ""
+    else:
+        return ""
+
 def getNameFromToken(token):
     cur.execute("SELECT name,token FROM register")
     data = cur.fetchall()
@@ -147,7 +160,7 @@ def getNameFromToken(token):
             if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
                 return row[0]
         else:
-            return False
+            return ""
 
 def checkToken(token):
     cur.execute("SELECT email,token FROM register")
@@ -163,7 +176,6 @@ def checkToken(token):
 
 if __name__ == '__main__':
     initDB()
-
     # dropUserTable()
     # addUser('email@gmail.com', 'password', 'test')
     # removeUser('email@gmail.com')
