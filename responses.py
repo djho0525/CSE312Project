@@ -26,11 +26,11 @@ def getResponse(server, path, received_data):
     header, form = util.buffering(server, received_data)
     print(form)
     if "token" in util.parseCookies(header).keys():
-         token = util.parseCookies(header)["token"]
-         userFromCookie = db.getEmailFromToken(token)
-         if userFromCookie != "":
+        token = util.parseCookies(header)["token"]
+        userFromCookie = db.getEmailFromToken(token)
+        if userFromCookie != "":
             print(userFromCookie + " requested the data above")
-    else: token = ""
+    else: token, userFromCookie = "", ""
 
 
     if path == "/":
@@ -118,7 +118,7 @@ def postResponse(server, path, received_data):
         userFromCookie = db.getEmailFromToken(token)
         if userFromCookie != False:
             print(userFromCookie + " requested the data above")
-    else: token = ""
+    else: token, userFromCookie = "", ""
 
     if path == "/login":
         return login_signup.login(email=form['email'], password=form['password'])
