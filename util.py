@@ -1,3 +1,6 @@
+import base64
+import hashlib
+
 import database as db
 
 def readBytes(filename):
@@ -240,12 +243,11 @@ def querying(path):
 def escapeHTML(string):
     return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
-def userFromCookies(header):
-    # if "Cookie" in header:
-    #     for i in header["Cookie"].split("; "):
+def parseCookies(header):
+    if "Cookie" not in header: return {}
+    return parsingToDict(header["Cookie"].split("; "), "=")
 
-    if "Cookie" in header and "user" in header["Cookie"]:
-        cookie = header["Cookie"]
-        cookie = cookie[cookie.index("user"):]
-        return cookie.split("; ")[0].split("=")[1]
-    else: return ''
+def computeHash(token):
+    hashed_token = token + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+    hashed_token = hashlib.sha1(hashed_token.encode()).digest()
+    return base64.b64encode(hashed_token)
