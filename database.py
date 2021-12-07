@@ -60,6 +60,11 @@ def loginUser(email):
     token_to_user[row[3]] = User(row[0], row[1], row[2], row[3])
     # print(users[email].token, token_to_user)
 
+def logoutUser(token):
+    if util.computeHash(token).decode() in token_to_user:
+        user = token_to_user.pop(util.computeHash(token).decode())
+        email_to_users.pop(user.email)
+
 def addMessage(sender, receiver, message):
     if receiver not in email_to_users[sender].messages or sender not in email_to_users[receiver].messages:
         email_to_users[sender].messages[receiver], email_to_users[receiver].messages[sender] = [], []

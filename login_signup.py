@@ -18,7 +18,7 @@ def login(email, password):
             r.currentUser.append(email)
             r.activeUsers.append(email)
 
-            return r.response301("/home", "token="+str(userToken)+"")
+            return r.response301("/home", "token="+str(userToken)+"; Max-Age=3600; HttpOnly")
         else:
             print('Login failed')
     else:
@@ -43,7 +43,7 @@ def signup(name, email, password, confirm_password):
             print('Created account successfully')
             r.activeUsers.append(email)
 
-            return r.response301("/home", "token="+str(userToken)+"")
+            return r.response301("/home", "token="+str(userToken)+"; Max-Age=3600; HttpOnly")
         else: print('Passwords do not match')
     return r. response301("/")
 

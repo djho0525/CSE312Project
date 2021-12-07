@@ -70,6 +70,9 @@ def getResponse(server, path, received_data):
             content = content.replace("{{colorMode}}",'darkMode.css')
             content = util.renderImages(content)
             return response200("text/html", len(content), content.encode())
+    elif path == "/logout":
+        db.logoutUser(token)
+        return response301('/', "token=; Max-Age=0; HttpOnly")
     elif path == "/lightMode.css":
         content = util.readBytes("static/lightMode.css")
         return response200("text/css", len(content), content)
