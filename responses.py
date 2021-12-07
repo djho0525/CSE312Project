@@ -46,6 +46,8 @@ def getResponse(server, path, received_data):
         content = util.readBytes("static/jessehartloff.jpeg")
         return response200("image/jpeg", len(content), content)
     elif path == "/messages" and "user" in queries:
+        if token == "":
+            return response301("/")
         if userFromCookie not in activeUsers: activeUsers.append(userFromCookie)
         return DM.getResponse(userFromCookie, queries['user'])
     elif path == "/direct_messaging.js":
