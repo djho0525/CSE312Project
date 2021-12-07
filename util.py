@@ -215,8 +215,8 @@ def escapeHTML(string):
     return string.replace('&', '&amp;').replace('<', '&lt;').replace('>', '&gt;')
 
 def userFromCookies(header):
-    if "Cookie" in header and "user" in header["Cookie"]:
+    if "Cookie" in header and "token" in header["Cookie"]:
         cookie = header["Cookie"]
-        cookie = cookie[cookie.index("user"):]
+        cookie = cookie[cookie.index("token"):]
         return cookie.split("; ")[0].split("=")[1]
     else: return ''

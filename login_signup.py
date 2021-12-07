@@ -1,5 +1,6 @@
 import database as db
 import responses as r
+import secrets
 import bcrypt
 
 def login(email, password):
@@ -7,12 +8,15 @@ def login(email, password):
     if db.userExists(email):
         user = db.getUser(email)
         if bcrypt.checkpw(password.encode(), user.password.encode()):
+            userToken = secrets.token_urlsafe(32)
+            userTokenHashed = bcrypt.hashpw(userToken.encode(), bcrypt.gensalt())
+            db.addTokenToUser(email, userTokenHashed)
             db.loginUser(email)
             r.currentUser.clear()
             r.currentUser.append(email)
             r.activeUsers.append(email)
 
-            return r.response301("/home", "user=" + email)
+            return r.response301("/home", "token="+str(userToken)+"")
         else:
             print('Login failed')
     else:
@@ -27,6 +31,7 @@ def signup(name, email, password, confirm_password):
         if password == confirm_password:
             # r.activeUsers[server] = email
             db.addUser(email, password, name)
+            db.addUserToRegister(email,name)
             db.loginUser(email)
             db.insertDefaultColor(email)
             r.currentUser.clear()
@@ -34,7 +39,7 @@ def signup(name, email, password, confirm_password):
             print('Created account successfully')
             r.activeUsers.append(email)
 
-            return r.response301("/home", "user=" + email)
+            return r.response301("/home", "token="+str(userToken)+"")
         else: print('Passwords do not match')
     return r. response301("/")
 
