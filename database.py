@@ -19,7 +19,13 @@ def initDB():
     cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
     cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
     cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
-    cur.execute("CREATE TABLE IF NOT EXISTS register(email VARCHAR(256) UNIQUE NOT NULL ,name TEXT NOT NULL,token TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS register (email VARCHAR(256) UNIQUE NOT NULL ,name TEXT NOT NULL,token TEXT)")
+
+def dropAllTables():
+    cur.execute("DROP TABLE users")
+    cur.execute("DROP TABLE uploads")
+    cur.execute("DROP TABLE colormode")
+    cur.execute("DROP TABLE register")
 
 users = {}      # {email: User object}
 
@@ -176,7 +182,7 @@ def checkToken(token):
 
 if __name__ == '__main__':
     initDB()
-    # dropUserTable()
+    # dropAllTables()
     # addUser('email@gmail.com', 'password', 'test')
     # removeUser('email@gmail.com')
     #setupUploadsTable()
