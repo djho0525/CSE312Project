@@ -26,9 +26,9 @@ def getResponse(server, path, received_data):
     header, form = util.buffering(server, received_data)
     print(form)
     if "token" in util.parseCookies(header).keys():
-        token = util.parseCookies(header)["token"]
-        userFromCookie = db.getEmailFromToken(token)
-        if userFromCookie != "":
+         token = util.parseCookies(header)["token"]
+         userFromCookie = db.getEmailFromToken(token)
+         if userFromCookie != "":
             print(userFromCookie + " requested the data above")
     else: token, userFromCookie = "", ""
 

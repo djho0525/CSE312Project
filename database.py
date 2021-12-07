@@ -154,19 +154,22 @@ def getEmailFromToken(token):
                 if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
                     return row[0]
             else:
-                return ""
+                return False
     else:
-        return ""
+        return False
 
 def getNameFromToken(token):
     cur.execute("SELECT name,token FROM register")
     data = cur.fetchall()
-    for row in data:
-        if row[1] != None:
-            if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
-                return row[0]
-        else:
-            return ""
+    if len(data) != 0:
+        for row in data:
+            if row[1] != None:
+                if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
+                    return row[0]
+            else:
+                return False
+    else:
+        return False
 
 def checkToken(token):
     cur.execute("SELECT email,token FROM register")
@@ -182,6 +185,8 @@ def checkToken(token):
 
 if __name__ == '__main__':
     initDB()
+    print(getEmailFromToken("wRJSV3tFylpqgEIKjKZDPuzOi7GdbpeYoTJdA5UwuG4"))
+    # dropUserTable()
     # dropAllTables()
     # addUser('email@gmail.com', 'password', 'test')
     # removeUser('email@gmail.com')
