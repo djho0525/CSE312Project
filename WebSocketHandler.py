@@ -5,6 +5,8 @@ import direct_messaging as DM
 
 #webSocketClients = {}
 #webSocketClientsList = []
+import util
+
 webSocketClientsDictList = {}
 
 def webSocketConnection(server, token):
@@ -49,12 +51,13 @@ def webSocketConnection(server, token):
                         for client in webSocketClientsDictList[user]:
                             #print("Websocket Client: " + str(client))
                             client.request.sendall(frameToSend)
+                    print(webSocketClientsDictList)
                 if "listener" in content.keys():
                     if content["listener"] == "direct_message":
                         sender, receiver = DM.newMessage(userFromCookie, content["message"])
 
-                        chatroom_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "chatroom", "message": content["message"], "sender": sender}))
-                        notif_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "notif", "message": content["message"], "sender": sender}))
+                        chatroom_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "chatroom", "message": util.escapeHTML(content["message"]), "sender": sender}))
+                        notif_frame = createWebSocketFrame(json.dumps({"listener": "direct_message", "type": "notif", "message": util.escapeHTML(content["message"]), "sender": sender}))
                         # webSocketClients[sender].request.sendall(chatroom_frame)
                         for client in webSocketClientsDictList[sender]:
                             client.request.sendall(chatroom_frame)

@@ -6,6 +6,7 @@ active_chatrooms = {}           # only sender to receiver
 
 def getResponse(sender, receiver):
     if receiver in r.activeUsers and sender != receiver:
+        senderName = db.getUser(sender).name
         active_chatrooms[sender] = receiver
 
         messages = ''
@@ -19,7 +20,7 @@ def getResponse(sender, receiver):
         content = util.readBytes("templates/direct_messaging.html")
         content = content.decode().replace('{{messages}}', messages).replace('{{receiver}}', util.escapeHTML(receiver)).replace("<!--ActiveUsers-->", users_dropdown)
 
-        content = content.replace("{{user}}", util.escapeHTML(sender))
+        content = content.replace("{{user}}", util.escapeHTML(senderName))
         if db.getColor(sender) == "light": content = content.replace("{{colorMode}}",'lightMode.css')
         else: content = content.replace("{{colorMode}}",'darkMode.css')
 

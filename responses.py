@@ -144,6 +144,12 @@ def postResponse(server, path, received_data):
         #return response301("/")
     elif path == "/logout":
         db.logoutUser(token)
+        userFromCookie = db.getEmailFromToken(token)
+        #Ensures that logged out user is removed from websocketclients
+        if WebSocketHandler.webSocketClientsDictList.get(userFromCookie) is not None:
+            if server in WebSocketHandler.webSocketClientsDictList.get(userFromCookie):
+                WebSocketHandler.webSocketClientsDictList.get(userFromCookie).remove(server)
+                print(WebSocketHandler.webSocketClientsDictList)
         return response301('/', "token=; Max-Age=0; HttpOnly")
     else:
         return response404()

@@ -198,7 +198,7 @@ def renderImages(html):
         allImageTagsCaptionLikes += "<div id=" + "upload" + str(imageID) + ">" + currentImageTag
         allImageTagsCaptionLikes += "<p class="+"image-caption" + " id=" + "image" + str(imageID) + ">" + "Likes ♥: " + str(likes) + "</p>"
         #allImageTagsCaptionLikes += "<br>"
-        allImageTagsCaptionLikes += "<p class="+"image-caption"+">" + caption + "</p>" +"</div>"
+        allImageTagsCaptionLikes += "<p class="+"image-caption"+">" + escapeHTML(caption) + "</p>" +"</div>"
         allImageTagsCaptionLikes = allImageTagsCaptionLikes.replace("{{uploadID}}", "image"+str(imageID))
         allImageTagsCaptionLikes = allImageTagsCaptionLikes.replace("{{imageToLikeID}}", "'" + "image" + str(imageID) + "'")
 
