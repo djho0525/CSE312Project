@@ -7,7 +7,10 @@ import direct_messaging as DM
 #webSocketClientsList = []
 webSocketClientsDictList = {}
 
-def webSocketConnection(server, userFromCookie):
+def webSocketConnection(server, token):
+    userFromCookie = database.getEmailFromToken(token)
+    if userFromCookie == "": return
+
     print(userFromCookie + " has connected")
 
     if userFromCookie not in r.activeUsers:

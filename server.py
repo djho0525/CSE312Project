@@ -18,8 +18,8 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
         self.request.sendall(response)
         if path == "/websocket":  # establish a websocket connection after serving the home page
             data = received_data.decode()
-            userFromCookie = data[data.index("user="):].split("\r\n")[0].split("; ")[0].split("=")[1]
-            WebSocketHandler.webSocketConnection(self, userFromCookie)
+            token = data[data.index("token="):].split("\r\n")[0].split("; ")[0].split("=")[1] if "token=" in data else ""
+            WebSocketHandler.webSocketConnection(self, token)
 
 if __name__ == "__main__":
     host = "0.0.0.0"
