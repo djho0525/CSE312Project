@@ -23,8 +23,8 @@ def response301(location, cookie=''):
 def getResponse(server, path, received_data):
     print("GET " + path)
     path, queries = util.querying(path)
-    header, data = util.buffering(server, received_data)
-    header = util.parseHeaders(header)
+    header, form = util.buffering(server, received_data)
+    print(form)
     userFromCookie = util.userFromCookies(header)
     print(userFromCookie + " requested the data above")
 
@@ -107,16 +107,9 @@ def postResponse(server, path, received_data):
     print("POST " + path)
     path, queries = util.querying(path)
     header, form = util.buffering(server, received_data)
-    header = util.parseHeaders(header)
+    print(form)
     userFromCookie = util.userFromCookies(header)
     print(userFromCookie + " requested the data above")
-
-    # try:
-    #     form = util.parsing(data.decode())
-    #     # print(form)
-    # except ValueError:
-    #     print("SKIPPED PARSING")
-
 
     if path == "/login":
         return login_signup.login(email=form['email'], password=form['password'])

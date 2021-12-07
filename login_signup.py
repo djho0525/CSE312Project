@@ -4,7 +4,6 @@ import secrets
 import bcrypt
 
 def login(email, password):
-    email = email.replace("%40", "@")
     if db.userExists(email):
         user = db.getUser(email)
         if bcrypt.checkpw(password.encode(), user.password.encode()):
@@ -25,7 +24,6 @@ def login(email, password):
 
 
 def signup(name, email, password, confirm_password):
-    email = email.replace("%40", "@")
     if db.userExists(email): print('Email was already registered')
     else:
         if password == confirm_password:
