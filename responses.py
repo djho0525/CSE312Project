@@ -23,14 +23,14 @@ def response301(location, cookie=''):
 def getResponse(server, path, received_data):
     print("GET " + path)
     path, queries = util.querying(path)
-    header, data = util.buffering(server, received_data)
-    header = util.parseHeaders(header)
+    header, form = util.buffering(server, received_data)
+    print(form)
     if "token" in util.parseCookies(header).keys():
          token = util.parseCookies(header)["token"]
          userFromCookie = db.getEmailFromToken(token)
-         if userFromCookie != False:
+         if userFromCookie != "":
             print(userFromCookie + " requested the data above")
-    else: token = ""
+    else: token, userFromCookie = "", ""
 
 
     if path == "/":
@@ -112,19 +112,13 @@ def postResponse(server, path, received_data):
     print("POST " + path)
     path, queries = util.querying(path)
     header, form = util.buffering(server, received_data)
-    header = util.parseHeaders(header)
+    print(form)
     if "token" in util.parseCookies(header).keys():
         token = util.parseCookies(header)["token"]
         userFromCookie = db.getEmailFromToken(token)
         if userFromCookie != False:
             print(userFromCookie + " requested the data above")
-    else: token = ""
-
-    '''try:
-        form = util.parsing(data.decode())
-        # print(form)
-    except ValueError:
-        print("SKIPPED PARSING")'''
+    else: token, userFromCookie = "", ""
 
     if path == "/login":
         return login_signup.login(email=form['email'], password=form['password'])

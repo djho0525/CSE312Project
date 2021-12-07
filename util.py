@@ -22,14 +22,13 @@ def buffering(server, received_data):
     while b'\r\n\r\n' not in received_data:
         received_data += server.request.recv(1024)
     data = received_data.split(b"\r\n\r\n", 1)
-    header, body = data[0].strip().decode().split('\r\n'), data[1]
-
+    header, body = parseHeaders(data[0].strip().decode().split('\r\n')[1:]), data[1]
     content_len = int(header["Content-Length"]) if "Content-Length" in header else 0
     content_type = header["Content-Type"] if "Content-Type" in header else ''
     while content_len-len(body) > 0:
         body += server.request.recv(1024)
     body = parseBody(body, content_type)
-    return header[1:], body
+    return header, body
 
 # def parsing(data):
 #     form = dict()
@@ -74,18 +73,16 @@ def parseHeaders(headers):
 
 def parseBody(body, content_type):
     content = {}
-    print(body)
     if body == b'': return {}
-    if 'multipart/form-data' in content_type:
-        boundary = ('--' + content_type.split("; ")[1].split("=")[1]).encode()
+    if 'multipart/form-data' == content_type['value']:          # ASSUME ALL MULTIPART/FORM-DATA ARE URL ENCODING
+        boundary = ('--' + content_type['extras']['boundary']).encode()
         body_list = list(filter(lambda x: x != b'\r\n' and x != b'' and x != b'--', body.strip().split(boundary)))
         for y in body_list:
             header, body = y.strip().split(b"\r\n\r\n", 1)
             header = header.decode().replace("\r\n", "; ").replace(": ", "=")
             temp = parsingToDict(header.split('; '), '=')
             name = temp.pop('name')[1:-1]            # remove quotations "" around name value
-            content[name] = body
-            for key, val in temp.items(): content[key] = val
+            content[name] = body.decode()                       # DECODE ASSUMES BODY CAN BE URL ENCODED
     else: content = parsingToDict(body.decode().split('&'), '=')
     return content
 

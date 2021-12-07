@@ -35,7 +35,7 @@
 </nav>
 
 <div class="form-group" id="loginForm" style="display:none">
-    <form action="/login" method="post">
+    <form action="/login" method="post" enctype="multipart/form-data">
         <label for="loginEmail">Email address:</label>
         <input type="email" class="form-control" id="loginEmail" name="email">
         <label for="loginPwd">Password:</label>
@@ -45,7 +45,7 @@
 </div>
 <br/>
 <div class="form-group" id="signUpForm" style="display:none">
-    <form action="/signUp" method="post">
+    <form action="/signUp" method="post" enctype="multipart/form-data">
         <label for="signUpName">Name:</label>
         <input type="text" class="form-control" id="signUpName" name="name">
         <label for="signUpEmail">Email:</label>
