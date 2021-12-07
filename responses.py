@@ -28,7 +28,6 @@ def getResponse(server, path, received_data):
     userFromCookie = util.userFromCookies(header)
     print(userFromCookie + " requested the data above")
 
-
     if path == "/":
         content = util.readBytes("templates/login.html")
         return response200("text/html", len(content), content)
@@ -107,16 +106,16 @@ def postResponse(server, path, received_data):
 
     print("POST " + path)
     path, queries = util.querying(path)
-    header, data = util.buffering(server, received_data)
+    header, form = util.buffering(server, received_data)
     header = util.parseHeaders(header)
     userFromCookie = util.userFromCookies(header)
     print(userFromCookie + " requested the data above")
 
-    try:
-        form = util.parsing(data.decode())
-        # print(form)
-    except ValueError:
-        print("SKIPPED PARSING")
+    # try:
+    #     form = util.parsing(data.decode())
+    #     # print(form)
+    # except ValueError:
+    #     print("SKIPPED PARSING")
 
 
     if path == "/login":
