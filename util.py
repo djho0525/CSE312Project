@@ -1,3 +1,6 @@
+import base64
+import hashlib
+
 import database as db
 
 def readBytes(filename):
@@ -74,7 +77,7 @@ def parseHeaders(headers):
 def parseBody(body, content_type):
     content = {}
     if body == b'': return {}
-    if 'multipart/form-data' == content_type['value']:          # ASSUME ALL MULTIPART/FORM-DATA ARE URL ENCODING
+    if 'value' in content_type and 'multipart/form-data' == content_type['value']:          # ASSUME ALL MULTIPART/FORM-DATA ARE URL ENCODING
         boundary = ('--' + content_type['extras']['boundary']).encode()
         body_list = list(filter(lambda x: x != b'\r\n' and x != b'' and x != b'--', body.strip().split(boundary)))
         for y in body_list:
@@ -240,3 +243,8 @@ def escapeHTML(string):
 def parseCookies(header):
     if "Cookie" not in header: return {}
     return parsingToDict(header["Cookie"].split("; "), "=")
+
+def computeHash(token):
+    hashed_token = token + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11"
+    hashed_token = hashlib.sha1(hashed_token.encode()).digest()
+    return base64.b64encode(hashed_token)

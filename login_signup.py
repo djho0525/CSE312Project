@@ -3,12 +3,15 @@ import responses as r
 import secrets
 import bcrypt
 
+import util
+
+
 def login(email, password):
     if db.userExists(email):
         user = db.getUser(email)
         if bcrypt.checkpw(password.encode(), user.password.encode()):
             userToken = secrets.token_urlsafe(32)
-            userTokenHashed = bcrypt.hashpw(userToken.encode(), bcrypt.gensalt())
+            userTokenHashed = util.computeHash(userToken)
             db.addTokenToUser(email, userTokenHashed)
             db.loginUser(email)
             r.currentUser.clear()
@@ -28,11 +31,11 @@ def signup(name, email, password, confirm_password):
     else:
         if password == confirm_password:
             # r.activeUsers[server] = email
-            db.addUser(email, password, name)
-            db.addUserToRegister(email,name)
+            # db.addUserToRegister(email,name)
             userToken = secrets.token_urlsafe(32)
-            userTokenHashed = bcrypt.hashpw(userToken.encode(), bcrypt.gensalt())
-            db.addTokenToUser(email, userTokenHashed)
+            userTokenHashed = util.computeHash(userToken)
+            db.addUser(email, password, name, userTokenHashed)
+
             db.loginUser(email)
             db.insertDefaultColor(email)
             r.currentUser.clear()

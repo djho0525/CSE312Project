@@ -1,5 +1,6 @@
 import mysql.connector as mysql
 import os
+import util
 from User import User
 import bcrypt
 
@@ -16,7 +17,7 @@ def initDB():
     # INITIALIZE DATABASE AND TABLES
     cur.execute("CREATE DATABASE IF NOT EXISTS " + database)
     db.database = database
-    cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT)")
+    cur.execute("CREATE TABLE IF NOT EXISTS users (email TEXT, password TEXT, name TEXT, token TEXT)")
     cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
     cur.execute("CREATE TABLE IF NOT EXISTS colormode (email TEXT NOT NULL, mode TEXT NOT NULL)")
     cur.execute("CREATE TABLE IF NOT EXISTS register (email VARCHAR(256) UNIQUE NOT NULL ,name TEXT NOT NULL,token TEXT)")
@@ -27,17 +28,15 @@ def dropAllTables():
     cur.execute("DROP TABLE colormode")
     cur.execute("DROP TABLE register")
 
-users = {}      # {email: User object}
+email_to_users = {}      # {email: User object}
+token_to_user = {}      # {token: User object}
 
 def hashPassword(password):
     return bcrypt.hashpw(password.encode(), bcrypt.gensalt())
 
-def dropUserTable():
-    cur.execute("DROP TABLE users")
-
-def addUser(email, password, name):
+def addUser(email, password, name, token):
     password = hashPassword(password)
-    cur.execute("INSERT INTO users (email, password, name) VALUES (%s, %s, %s)", (email, password, name))
+    cur.execute("INSERT INTO users (email, password, name, token) VALUES (%s, %s, %s, %s)", (email, password, name, token))
     db.commit()
 
 def removeUser(email):
@@ -47,31 +46,47 @@ def removeUser(email):
 def userExists(email):
     cur.execute("SELECT * FROM users WHERE email=%s",(email,))
     row = cur.fetchone()
-    if row is not None:
-        return True
-    else:
-        return False
+    return row
 
 def getUser(email):
     cur.execute("SELECT * FROM users WHERE email=%s", (email,))
     row = cur.fetchone()
-    return User(row[0], row[1], row[2])
+    return User(row[0], row[1], row[2], row[3])
 
 def loginUser(email):
     cur.execute("SELECT * FROM users WHERE email=%s", (email,))
     row = cur.fetchone()
-    users[email] = User(row[0], row[1], row[2])
+    email_to_users[email] = User(row[0], row[1], row[2], row[3])
+    token_to_user[row[3]] = User(row[0], row[1], row[2], row[3])
+    # print(users[email].token, token_to_user)
 
 def addMessage(sender, receiver, message):
-    if receiver not in users[sender].messages or sender not in users[receiver].messages:
-        users[sender].messages[receiver], users[receiver].messages[sender] = [], []
-    users[sender].messages[receiver].append({'user': sender, 'content': message})
-    users[receiver].messages[sender].append({'user': sender, 'content': message})
+    if receiver not in email_to_users[sender].messages or sender not in email_to_users[receiver].messages:
+        email_to_users[sender].messages[receiver], email_to_users[receiver].messages[sender] = [], []
+    email_to_users[sender].messages[receiver].append({'user': sender, 'content': message})
+    email_to_users[receiver].messages[sender].append({'user': sender, 'content': message})
 
 def getMessages(sender, receiver):
-    if sender not in users[receiver].messages or receiver not in users[sender].messages:
-        users[receiver].messages[sender], users[sender].messages[receiver] = [], []
-    return users[receiver].messages[sender]
+    if sender not in email_to_users[receiver].messages or receiver not in email_to_users[sender].messages:
+        email_to_users[receiver].messages[sender], email_to_users[sender].messages[receiver] = [], []
+    return email_to_users[receiver].messages[sender]
+
+def addTokenToUser(email,token):
+    cur.execute("UPDATE users SET token=%s WHERE email=%s",(token,email,))
+    db.commit()
+
+def getUserByToken(token):
+    if util.computeHash(token).decode() in token_to_user:
+        return token_to_user[util.computeHash(token).decode()]
+    else: return None
+
+def getEmailFromToken(token):
+    user = getUserByToken(token)
+    return user.email if user else ''
+
+def getNameFromToken(token):
+    user = getUserByToken(token)
+    return user.email if user else ''
 
 def setupUploadsTable():
     cur.execute("CREATE TABLE IF NOT EXISTS uploads (uploadID int NOT NULL AUTO_INCREMENT PRIMARY KEY, imagepath TEXT NOT NULL, caption TEXT, likes INT NOT NULL DEFAULT 0)")
@@ -141,36 +156,6 @@ def addUserToRegister(email,name):
     cur.execute("INSERT INTO register(email,name) VALUES(%s,%s)",(email,name,))
     db.commit()
 
-def addTokenToUser(email,token):
-    cur.execute("UPDATE register SET token=%s WHERE email=%s",(token,email,))
-    db.commit()
-
-def getEmailFromToken(token):
-    cur.execute("SELECT email,token FROM register")
-    data = cur.fetchall()
-    if len(data) != 0:
-        for row in data:
-            if row[1] != None:
-                if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
-                    return row[0]
-            else:
-                return False
-    else:
-        return False
-
-def getNameFromToken(token):
-    cur.execute("SELECT name,token FROM register")
-    data = cur.fetchall()
-    if len(data) != 0:
-        for row in data:
-            if row[1] != None:
-                if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
-                    return row[0]
-            else:
-                return False
-    else:
-        return False
-
 def checkToken(token):
     cur.execute("SELECT email,token FROM register")
     data = cur.fetchall()
@@ -180,16 +165,13 @@ def checkToken(token):
             if bcrypt.checkpw(token.encode("utf-8"),row[1].encode("utf-8")) == True:
                 return row[0]
         else:
-            return False
-    return False
+            return ''
+    return ''
 
 if __name__ == '__main__':
     initDB()
-    print(getEmailFromToken("wRJSV3tFylpqgEIKjKZDPuzOi7GdbpeYoTJdA5UwuG4"))
-    # dropUserTable()
     # dropAllTables()
-    # addUser('email@gmail.com', 'password', 'test')
-    # removeUser('email@gmail.com')
+    # print(getEmailFromToken("wRJSV3tFylpqgEIKjKZDPuzOi7GdbpeYoTJdA5UwuG4"))
     #setupUploadsTable()
     #uploadImage("/imageuploads/image1.jpg","hi")
     #print(getImageByID(1)[0]#[1])
