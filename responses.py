@@ -34,6 +34,7 @@ def getResponse(server, path, received_data):
 
 
     if path == "/":
+        if token != "" and userFromCookie != "": return response301("/home")
         content = util.readBytes("templates/login.html")
         return response200("text/html", len(content), content)
     elif path == "/login.css":
@@ -74,9 +75,6 @@ def getResponse(server, path, received_data):
             content = content.replace("{{colorMode}}",'darkMode.css')
             content = util.renderImages(content)
             return response200("text/html", len(content), content.encode())
-    elif path == "/logout":
-        db.logoutUser(token)
-        return response301('/', "token=; Max-Age=0; HttpOnly")
     elif path == "/lightMode.css":
         content = util.readBytes("static/lightMode.css")
         return response200("text/css", len(content), content)
@@ -145,7 +143,7 @@ def postResponse(server, path, received_data):
         #activeUsers.pop(server)
         #return response301("/")
     elif path == "/logout":
-        activeUsers.pop(server)
-        return response301("/")
+        db.logoutUser(token)
+        return response301('/', "token=; Max-Age=0; HttpOnly")
     else:
         return response404()
