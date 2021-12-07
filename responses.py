@@ -25,8 +25,13 @@ def getResponse(server, path, received_data):
     path, queries = util.querying(path)
     header, form = util.buffering(server, received_data)
     print(form)
-    userFromCookie = util.userFromCookies(header)
-    print(userFromCookie + " requested the data above")
+    if "token" in util.parseCookies(header).keys():
+         token = util.parseCookies(header)["token"]
+         userFromCookie = db.getEmailFromToken(token)
+         if userFromCookie != "":
+            print(userFromCookie + " requested the data above")
+    else: token = ""
+
 
     if path == "/":
         content = util.readBytes("templates/login.html")
@@ -56,7 +61,7 @@ def getResponse(server, path, received_data):
                     if x != userFromCookie:
                         line = line + '<a class ="dropdown-item" href="/messages?user=' + x + '">' + x + '</a>'
             content = content + line
-        content = content.replace("{{user}}", db.getNameFromToken(userFromCookie))
+        content = content.replace("{{user}}", db.getNameFromToken(token))
         if db.getColor(userFromCookie) == "light":
             content = content.replace("{{colorMode}}",'lightMode.css')
             content = util.renderImages(content)
@@ -108,8 +113,12 @@ def postResponse(server, path, received_data):
     path, queries = util.querying(path)
     header, form = util.buffering(server, received_data)
     print(form)
-    userFromCookie = util.userFromCookies(header)
-    print(userFromCookie + " requested the data above")
+    if "token" in util.parseCookies(header).keys():
+        token = util.parseCookies(header)["token"]
+        userFromCookie = db.getEmailFromToken(token)
+        if userFromCookie != False:
+            print(userFromCookie + " requested the data above")
+    else: token = ""
 
     if path == "/login":
         return login_signup.login(email=form['email'], password=form['password'])
