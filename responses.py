@@ -143,6 +143,7 @@ def postResponse(server, path, received_data):
         #activeUsers.pop(server)
         #return response301("/")
     elif path == "/logout":
+        activeUsers.pop(server) if server in activeUsers else True
         db.logoutUser(token)
         userFromCookie = db.getEmailFromToken(token)
         #Ensures that logged out user is removed from websocketclients

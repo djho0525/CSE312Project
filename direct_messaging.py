@@ -15,7 +15,7 @@ def getResponse(sender, receiver):
 
         users_dropdown = ''
         for user in r.activeUsers:
-            users_dropdown += '<a class ="dropdown-item" href="/messages?user=' + util.escapeHTML(user) + '">' + util.escapeHTML(user) + '</a>'
+            users_dropdown += '<a class ="dropdown-item" href="/messages?user=' + util.escapeHTML(user) + '">' + util.escapeHTML(user) + '</a>' if user != sender else ''
 
         content = util.readBytes("templates/direct_messaging.html")
         content = content.decode().replace('{{messages}}', messages).replace('{{receiver}}', util.escapeHTML(receiver)).replace("<!--ActiveUsers-->", users_dropdown)
