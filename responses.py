@@ -16,8 +16,8 @@ def response200(con_type, length, content):  # input content has to be encoded
 def response404(content='The requested content does not exist'):
     return b"HTTP/1.1 404 Not Found\r\nContent-Type: text/plain\r\nContent-Length: " + str(len(content)).encode() + b"\r\n\r\n" + content.encode()
 
-def response301(location, cookie=''):
-    return b"HTTP/1.1 301 Moved Permanently\r\nContent-Length: 0\r\nLocation: " + location.encode() + b"\r\nSet-cookie: " + cookie.encode() + b"\r\n\r\n"
+def response302(location, cookie=''):
+    return b"HTTP/1.1 302 Moved Temporarily\r\nContent-Length: 0\r\nLocation: " + location.encode() + b"\r\nSet-cookie: " + cookie.encode() + b"\r\n\r\n"
 
 
 def getResponse(server, path, received_data):
@@ -34,7 +34,10 @@ def getResponse(server, path, received_data):
 
 
     if path == "/":
-        if token != "" and userFromCookie != "": return response301("/home")
+        user = db.getUserFromDBByToken(token)
+        stored_token = user.token if user else ''
+        if user and stored_token != '': return response302("/home")
+
         content = util.readBytes("templates/login.html")
         return response200("text/html", len(content), content)
     elif path == "/login.css":
@@ -47,16 +50,20 @@ def getResponse(server, path, received_data):
         content = util.readBytes("static/jessehartloff.jpeg")
         return response200("image/jpeg", len(content), content)
     elif path == "/messages" and "user" in queries:
-        if token == "":
-            return response301("/")
+        user = db.getUserFromDBByToken(token)
+        stored_token = user.token if user else ''
+        if not user or stored_token == '': return response302("/")
+
         if userFromCookie not in activeUsers: activeUsers.append(userFromCookie)
         return DM.getResponse(userFromCookie, queries['user'])
     elif path == "/direct_messaging.js":
         content = util.readBytes("static/direct_messaging.js")
         return response200("text/javascript", len(content), content)
     elif path == "/home":
-        if token == "":
-            return response301("/")
+        user = db.getUserFromDBByToken(token)
+        stored_token = user.token if user else ''
+        if not user or stored_token == '': return response302("/")
+
         content = ""
         idxFile = open('templates/index.html', 'rt').readlines()
         if userFromCookie not in activeUsers: activeUsers.append(userFromCookie)
@@ -112,7 +119,7 @@ def postResponse(server, path, received_data):
     # Body of image must not be decoded, data is decoded below
     if path == "/image-upload":
         util.imageUpload(server, received_data)
-        return response301("/home")
+        return response302("/home")
 
     print("POST " + path)
     path, queries = util.querying(path)
@@ -130,18 +137,18 @@ def postResponse(server, path, received_data):
     elif path == '/signUp':
         return login_signup.signup(name=form['name'], email=form['email'], password=form['password'], confirm_password=form['confirm_password'])
     elif path == "/image-upload":
-        return response301("/")
+        return response302("/")
     elif path == "/mode":
         # print(userFromCookie + " has made a request for ")
         db.updateColor(userFromCookie, form["Mode"])
-        return response301("/home")
+        return response302("/home")
     #elif path == "/upvote":
         #imageID = int(str(form["uploadID"]).strip("image"))
         #db.addLike(imageID)
-        #return response301("/home")
+        #return response302("/home")
     #elif path == "/logout":
         #activeUsers.pop(server)
-        #return response301("/")
+        #return response302("/")
     elif path == "/logout":
         activeUsers.pop(server) if server in activeUsers else True
         db.logoutUser(token)
@@ -151,6 +158,6 @@ def postResponse(server, path, received_data):
             if server in WebSocketHandler.webSocketClientsDictList.get(userFromCookie):
                 WebSocketHandler.webSocketClientsDictList.get(userFromCookie).remove(server)
                 print(WebSocketHandler.webSocketClientsDictList)
-        return response301('/', "token=; Max-Age=0; HttpOnly")
+        return response302('/', "token=; Max-Age=0; HttpOnly")
     else:
         return response404()

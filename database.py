@@ -64,6 +64,8 @@ def logoutUser(token):
     if util.computeHash(token).decode() in token_to_user:
         user = token_to_user.pop(util.computeHash(token).decode())
         email_to_users.pop(user.email)
+        cur.execute("UPDATE users SET token=%s WHERE token=%s",('',token,))
+        db.commit()
 
 def addMessage(sender, receiver, message):
     if receiver not in email_to_users[sender].messages or sender not in email_to_users[receiver].messages:
@@ -79,6 +81,11 @@ def getMessages(sender, receiver):
 def addTokenToUser(email,token):
     cur.execute("UPDATE users SET token=%s WHERE email=%s",(token,email,))
     db.commit()
+
+def getUserFromDBByToken(token):
+    cur.execute("SELECT * FROM users WHERE token=%s", (util.computeHash(token).decode(),))
+    row = cur.fetchone()
+    return User(row[0], row[1], row[2], row[3]) if row else None
 
 def getUserByToken(token):
     if util.computeHash(token).decode() in token_to_user:
@@ -175,7 +182,7 @@ def checkToken(token):
 
 if __name__ == '__main__':
     initDB()
-    print(getEmailFromToken("wRJSV3tFylpqgEIKjKZDPuzOi7GdbpeYoTJdA5UwuG4"))
+    # print(getEmailFromToken("wRJSV3tFylpqgEIKjKZDPuzOi7GdbpeYoTJdA5UwuG4"))
     # dropUserTable()
     # dropAllTables()
     # print(getEmailFromToken("wRJSV3tFylpqgEIKjKZDPuzOi7GdbpeYoTJdA5UwuG4"))
